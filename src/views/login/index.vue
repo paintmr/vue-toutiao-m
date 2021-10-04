@@ -133,7 +133,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .send-sms-btn {
   width: 152px;
   height: 46px;
