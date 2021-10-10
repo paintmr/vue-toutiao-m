@@ -44,6 +44,7 @@ export const getUserInfo = () => {
 
 /**
  * 获取用户频道列表
+ * 不强制用户登录，非登录用户也可以获取默认的频道列表
  */
 export const getUserChannels = () => {
   return request({
