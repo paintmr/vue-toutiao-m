@@ -2,7 +2,7 @@
   <div class="search-container">
     <!-- 搜索栏 -->
     <!-- 在 van-search 外层增加 form 标签，且 action 不为空，即可在 iOS 输入法中显示搜索按钮。 -->
-    <form action="/">
+    <form action="/" class="search-form">
     <!-- 获得焦点时@focus，说明用户要输入新的内容了，就得关闭搜索结果页面 -->
       <van-search
         v-model="searchText"
@@ -17,19 +17,28 @@
     <!-- /搜索栏 -->
 
     <!-- 搜索结果 -->
-    <search-result v-if="isResultShow" />
+    <search-result
+      v-if="isResultShow"
+      :search-text="searchText"
+    />
     <!-- /搜索结果 -->
 
     <!-- 联想建议 -->
     <search-suggestion
       v-else-if="searchText"
       :search-text="searchText"
+      @search="onSearch"
     />
     <!-- /联想建议 -->
 
     <!-- 搜索历史记录 -->
     <!-- 标签最好写这种小写的<search-history>。写大写的<SearchHistory>也可以。 -->
-    <search-history v-else />
+    <search-history
+      v-else
+      :search-histories="searchHistories"
+      @clear-search-histories="searchHistories = []"
+      @search="onSearch"
+    />
     <!-- /搜索历史记录 -->
   </div>
 </template>
@@ -38,6 +47,7 @@
 import SearchHistory from './components/search-history'
 import SearchSuggestion from './components/search-suggestion'
 import SearchResult from './components/search-result'
+import { setItem, getItem } from '@/utils/storage'
 
 export default {
   name: 'SearchIndex',
@@ -49,12 +59,29 @@ export default {
   data () {
     return {
       searchText: '',
-      isResultShow: false // 控制搜索结果的展示
+      isResultShow: false, // 控制搜索结果的展示
+      searchHistories: getItem('VUETOUTIAO_SEARCH_HISTORIES') || [] // 首次加载是getItem()拿到的是null，为了防止后续的数组操作出错，这时要给searchHistories赋值一个空数组。
+    }
+  },
+  watch: {
+    searchHistories (history) {
+      setItem('VUETOUTIAO_SEARCH_HISTORIES', history)
     }
   },
   methods: {
     onSearch (val) {
-      this.$toast(val)
+      // 更新文本框内容
+      this.searchText = val
+
+      // 存储搜索历史记录
+      // 要求：不要有重复历史记录，最新的排在最前面
+      const index = this.searchHistories.indexOf(val)
+      if (index !== -1) {
+        this.searchHistories.splice(index, 1)
+      }
+      this.searchHistories.unshift(val)
+
+      // 展示搜索结果
       this.isResultShow = true
     },
     onCancel () {
@@ -66,8 +93,18 @@ export default {
 
 <style scoped lang="less">
 .search-container {
+  padding-top: 108px;
+
   .van-search__action {
     color: #fff;
+  }
+
+  .search-form{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
   }
 }
 </style>
