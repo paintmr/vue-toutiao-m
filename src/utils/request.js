@@ -1,11 +1,29 @@
 // 请求模块
 import axios from 'axios'
 import store from '@/store'
+import JSONBig from 'json-bigint'
+/**
+ * JSONBig可以处理数据中超出JavaScript安全整数范围的问题
+ * JSONBig.parse() // 把JSON格式的字符串转为JavaScript对象
+ * 使用的时候要把BigNumber类型的数据转为字符串来使用
+ * JSONBig.stringify() //把JavaScript对象转为JSON格式的字符串
+*/
 
 const request = axios.create({
   // 接口的基准路径
   // baseURL: 'http://ttapi.research.itcast.cn/'
-  baseURL: 'http://toutiao-app.itheima.net/'
+  baseURL: 'http://toutiao-app.itheima.net/',
+  // 以后端返回的原始数据为基础，自定义返回的数据形态。
+  transformResponse: [function (data) {
+    // axios默认处理方式：
+    // return JSON.parse(data)
+    // data是后端返回的原始数据，一般是JSON格式的字符串。但data偶尔可能不是JSON格式的字符串，所以用try catch的代码。
+    try {
+      return JSONBig.parse(data)
+    } catch (err) {
+      return data
+    }
+  }]
 })
 
 // 这是axios自带的请求拦截器

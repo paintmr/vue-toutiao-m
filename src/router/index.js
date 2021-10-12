@@ -42,6 +42,12 @@ const routes = [
     path: '/search',
     name: 'search',
     component: () => import('@/views/search')
+  },
+  {
+    path: '/article/:articleId',
+    name: 'article',
+    component: () => import('@/views/article'),
+    props: true // 开启props传参，即把路由参数映射到组件的props数据中
   }
 ]
 

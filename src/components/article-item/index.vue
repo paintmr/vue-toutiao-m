@@ -1,5 +1,18 @@
 <template>
-  <van-cell class="article-item">
+  <!-- <van-cell class="article-item" :to="'/article/' + article.art_id">  -->
+  <!-- van-cell中的to属性还可以写成 -->
+  <!-- <van-cell class="article-item" :to="`/article/${article.art_id}`"> -->
+  <!-- van-cell中的to属性还可以写成 -->
+  <van-cell
+    class="article-item"
+    :to="{
+      name: 'article', // 路由中设定的名称
+      params: {
+        articleId: article.art_id // articleId是路由中设定的参数名称
+      }
+    }"
+  >
+  <!-- van-cell中to属性的用法和VueRouter中的RouterLink组件的to属性用法一样 -->
     <!-- van-multi-ellipsis--l2是vant的内置样式，最多两行显示文字，多余的用省略号代替 -->
     <div class="title van-multi-ellipsis--l2" slot="title">{{ article.title }}</div>
     <div class="label" slot="label">
