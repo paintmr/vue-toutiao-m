@@ -26,7 +26,9 @@ module.exports = {
         // 如果file中含有vant样式，则按照37.5的rootValue来处理，否则75
         return file.indexOf('vant') !== -1 ? 37.5 : 75
       },
-      propList: ['*']
+      propList: ['*'],
+      // 配置不要转换的样式资源
+      exclude: 'github-markdown'
     }
   }
 }

@@ -10,13 +10,13 @@
 
     <div class="main-wrap">
       <!-- 加载中 -->
-      <div class="loading-wrap">
+      <div v-if="loading" class="loading-wrap">
         <van-loading color="#3296fa" vertical></van-loading>
       </div>
       <!-- /加载中 -->
 
       <!-- 加载完成-文章详情 -->
-      <div class="article-detail">
+      <div v-else-if="article.title" class="article-detail">
         <!-- 文章标题 -->
         <h1 class="article-title">{{ article.title }}</h1>
         <!-- /文章标题 -->
@@ -32,36 +32,57 @@
           />
           <div slot="title" class="user-name">{{ article.aut_name }}</div>
           <div slot="label" class="publish-date">{{ article.pubdate | relativeTime}}</div>
+          <!-- <van-button
+            v-if="article.is_followed"
+            class="follow-btn"
+            round
+            size="small"
+            @click="onFollow"
+            :loading="followLoading"
+          >已关注</van-button>
           <van-button
+            v-else
             class="follow-btn"
             type="info"
             color="#3296fa"
             round
             size="small"
             icon="plus"
-          >关注</van-button>
+            @click="onFollow"
+            :loading="followLoading"
+          >关注</van-button> -->
+          <follow-user
+            :is-followed="article.is_followed"
+            class="follow-btn"
+            :user-id="article.aut_id"
+            @update-is_followed="article.is_followed = $event"
+          />
         </van-cell>
         <!-- /用户信息 -->
 
         <!-- 文章内容 -->
-        <div class="article-content" v-html="article.content"></div>
+        <div
+          class="article-content markdown-body"
+          v-html="article.content"
+          ref="article-content"
+        ></div>
         <van-divider>正文结束</van-divider>
         <!-- /文章内容 -->
       </div>
       <!-- /加载完成-文章详情 -->
 
       <!-- 加载失败：404 -->
-      <div class="error-wrap">
+      <div v-else-if="errStatus === 404" class="error-wrap">
         <van-icon name="failure" />
         <p class="text">该资源不存在或已删除</p>
       </div>
       <!-- /加载失败：404 -->
 
-      <!-- 加载失败：其它位置错误（如网络原因或服务单异常 -->
-      <div class="error-wrap">
+      <!-- 加载失败：其它未知错误（如网络原因或服务单异常 -->
+      <div v-else class="error-wrap">
         <van-icon name="failure" />
         <p class="text">内容加载失败</p>
-        <van-button class="retry-btn">点击重试</van-button>
+        <van-button class="retry-btn" @click="loadArticle">点击重试</van-button>
       </div>
       <!-- /加载失败：其它位置错误（如网络原因或服务单异常 -->
     </div>
@@ -99,9 +120,14 @@
 
 <script>
 import { getArticleById } from '@/api/article'
+import { ImagePreview } from 'vant'
+import FollowUser from '@/components/follow-user'
 
 export default {
   name: 'ArticleIndex',
+  components: {
+    FollowUser
+  },
   props: {
     articleId: {
       type: [Number, String, Object], // 如果从文章列表跳转到某篇文章详情，articleId是数字；如果直接输入URL访问文章详情，articleId是字符串。还要考虑到JSONBig.parse(data) 會把超出 JS 安全整數範圍的數字轉為一個 BigNumber 類型的對象的情况。
@@ -110,7 +136,10 @@ export default {
   },
   data () {
     return {
-      article: {} // 文章详情
+      article: {}, // 文章详情
+      loading: true, // 加载中的loading状态
+      errStatus: 0, // 失败状态码
+      followLoading: false
     }
   },
   created () {
@@ -118,18 +147,57 @@ export default {
   },
   methods: {
     async loadArticle () {
+      this.loading = true
       try {
         const { data } = await getArticleById(this.articleId)
+
+        // 模拟随机请求失败的代码。随机给代码插入一段非JSON格式的代码
+        // if (Math.random() > 0.5) {
+        //   JSON.parse('dasdfasd')
+        // }
+
         this.article = data.data
+
+        // 初始化图片点击预览
+        // 得到数据，渲染画面，这两个步骤之间有时间差。所以立即执行console.log(this.$refs['article-content'])打印出来是undefined。得延迟一下。
+        setTimeout(() => {
+          // console.log(this.$refs['article-content'])
+          this.previewImage()
+        }, 0)
       } catch (err) {
+        if (err.response && err.response.status === 404) {
+          this.errStatus = 404
+        }
         console.log('获取数据失败', err)
       }
+      // 不论请求成功或失败，都停止loading
+      this.loading = false
+    },
+    previewImage () {
+      // 得到所有的img节点
+      const articleContent = this.$refs['article-content']
+      const imgs = articleContent.querySelectorAll('img')
+      // 得到所有图片的地址
+      const imgsSrc = []
+      imgs.forEach((img, index) => {
+        imgsSrc.push(img.src)
+        // 给每个图片注册点击事件
+        img.onclick = () => {
+          ImagePreview({
+            // 预览的图片地址数组
+            images: imgsSrc,
+            startPosition: index // 起始位置，从0开始
+          })
+        }
+      })
     }
   }
 }
 </script>
 
 <style scoped lang="less">
+@import "./github-markdown.css";
+
 .article-container {
 
   .main-wrap {
