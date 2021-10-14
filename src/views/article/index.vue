@@ -32,6 +32,8 @@
           />
           <div slot="title" class="user-name">{{ article.aut_name }}</div>
           <div slot="label" class="publish-date">{{ article.pubdate | relativeTime}}</div>
+
+          <!-- 关注和取关源代码 -->
           <!-- <van-button
             v-if="article.is_followed"
             class="follow-btn"
@@ -51,11 +53,20 @@
             @click="onFollow"
             :loading="followLoading"
           >关注</van-button> -->
-          <follow-user
+
+          <!-- 组件化之后的关注和取关代码 -->
+          <!-- <follow-user
             :is-followed="article.is_followed"
             class="follow-btn"
             :user-id="article.aut_id"
             @update-is_followed="article.is_followed = $event"
+          /> -->
+
+          <!-- v-model的关注和取关代码 -->
+          <follow-user
+            v-model="article.is_followed"
+            class="follow-btn"
+            :user-id="article.aut_id"
           />
         </van-cell>
         <!-- /用户信息 -->

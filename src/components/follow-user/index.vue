@@ -23,6 +23,10 @@ import { addFollow, deleteFollow } from '@/api/user'
 
 export default {
   name: 'FollowUser',
+  model: {
+    prop: 'isFollowed',
+    event: 'update-is_followed'
+  },
   props: {
     isFollowed: {
       type: Boolean,
@@ -49,6 +53,7 @@ export default {
           // 未关注，添加关注
           await addFollow(this.userId)
         }
+        // this.$emit('input', !this.value)
         this.$emit('update-is_followed', !this.isFollowed)
       } catch (err) {
         console.log(err)
