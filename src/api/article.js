@@ -14,15 +14,18 @@ export const getArticles = params => {
     params
   })
 }
+
 /**
  * 请求获取文章详情数据
  */
 export const getArticleById = articleId => {
+  // console.log(typeof articleId)
   return request({
     method: 'GET',
     url: `/v1_0/articles/${articleId}` // 经过src/utils/reques.js中的JSONBig.parse(data)处理后，这里的articleId变成了BigNumber类型的对象。在这个url里，对象和字符串拼接，对象也成了字符串的一部分。任何数据和字符串拼接，都会变成字符串。
   })
 }
+
 /**
  * 收藏文章
  */

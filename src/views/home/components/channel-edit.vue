@@ -91,21 +91,25 @@ export default {
       }
     },
     async onAddChannel (channel) {
-      this.myChannels.push(channel)
-      // 数据持久化处理
-      if (this.user) {
-        // 1 已登录，把数据存储到服务器
-        try {
-          await addUserChannel({
-            id: channel.id,
-            seq: this.myChannels.length // 频道序号
-          })
-        } catch (err) {
-          this.$toast('添加频道失败')
+      if (this.isEdit) {
+        this.myChannels.push(channel)
+        // 数据持久化处理
+        if (this.user) {
+          // 1 已登录，把数据存储到服务器
+          try {
+            await addUserChannel({
+              id: channel.id,
+              seq: this.myChannels.length // 频道序号
+            })
+          } catch (err) {
+            this.$toast('添加频道失败')
+          }
+        } else {
+        // 2 未登录，把数据存储到本地
+          setItem('VUETOUTIAO_CHANNELS', this.myChannels)
         }
       } else {
-      // 2 未登录，把数据存储到本地
-        setItem('VUETOUTIAO_CHANNELS', this.myChannels)
+        this.$toast('请先点击编辑按钮')
       }
     },
     onMyChannelClick (channel, index) {

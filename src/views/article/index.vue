@@ -81,6 +81,13 @@
         <van-divider>正文结束</van-divider>
         <!-- /文章内容 -->
 
+        <!-- 文章评论列表 -->
+        <comment-list
+          :source="article.art_id"
+          @onload-success = "totalCommentCount = $event.total_count"
+        />
+        <!-- /文章评论列表 -->
+
         <!-- 把底部区域放到这里，确保在有数据以后，再加载底部区域。否则评论、收藏等需要数据的组件没有数据，需要刷新才能正常显示。 -->
         <!-- 底部区域 -->
         <div class="article-bottom">
@@ -93,7 +100,7 @@
           <van-icon
             class="comment-icon"
             name="comment-o"
-            badge="123"
+            :badge="totalCommentCount"
           />
           <!-- <van-icon
             name="star-o"
@@ -147,13 +154,15 @@ import { ImagePreview } from 'vant'
 import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
+import CommentList from './components/comment-list'
 
 export default {
   name: 'ArticleIndex',
   components: {
     FollowUser,
     CollectArticle,
-    LikeArticle
+    LikeArticle,
+    CommentList
   },
   props: {
     articleId: {
@@ -166,7 +175,8 @@ export default {
       article: {}, // 文章详情
       loading: true, // 加载中的loading状态
       errStatus: 0, // 失败状态码
-      followLoading: false
+      followLoading: false,
+      totalCommentCount: 0
     }
   },
   created () {
