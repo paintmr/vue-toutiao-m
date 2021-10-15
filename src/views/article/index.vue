@@ -5,6 +5,7 @@
       class="page-nav-bar"
       left-arrow
       title="黑马头条"
+      @click-left="$router.back()"
     ></van-nav-bar>
     <!-- /导航栏 -->
 
@@ -79,6 +80,46 @@
         ></div>
         <van-divider>正文结束</van-divider>
         <!-- /文章内容 -->
+
+        <!-- 把底部区域放到这里，确保在有数据以后，再加载底部区域。否则评论、收藏等需要数据的组件没有数据，需要刷新才能正常显示。 -->
+        <!-- 底部区域 -->
+        <div class="article-bottom">
+          <van-button
+            class="comment-btn"
+            type="default"
+            round
+            size="small"
+          >写评论</van-button>
+          <van-icon
+            class="comment-icon"
+            name="comment-o"
+            badge="123"
+          />
+          <!-- <van-icon
+            name="star-o"
+            color="#777"
+          /> -->
+          <collect-article
+            class="btn-item"
+            v-model="article.is_collected"
+            :article-id="article.art_id"
+          />
+          <!-- <van-icon
+            class="btn-item"
+            name="good-job-o"
+            color="#777"
+          /> -->
+          <like-article
+            class="btn-item"
+            v-model="article.attitude"
+            :article-id="article.art_id"
+          />
+          <van-icon
+            name="share"
+            color="#777"
+          />
+        </div>
+        <!-- /底部区域 -->
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -97,35 +138,6 @@
       </div>
       <!-- /加载失败：其它位置错误（如网络原因或服务单异常 -->
     </div>
-
-    <!-- 底部区域 -->
-    <div class="article-bottom">
-      <van-button
-        class="comment-btn"
-        type="default"
-        round
-        size="small"
-      >写评论</van-button>
-      <van-icon
-        name="comment-o"
-        badge="123"
-        color="#777"
-      />
-      <van-icon
-        name="star-o"
-        color="#777"
-      />
-      <van-icon
-        name="good-job-o"
-        color="#777"
-      />
-      <van-icon
-        name="share"
-        color="#777"
-      />
-    </div>
-    <!-- /底部区域 -->
-
   </div>
 </template>
 
@@ -133,11 +145,15 @@
 import { getArticleById } from '@/api/article'
 import { ImagePreview } from 'vant'
 import FollowUser from '@/components/follow-user'
+import CollectArticle from '@/components/collect-article'
+import LikeArticle from '@/components/like-article'
 
 export default {
   name: 'ArticleIndex',
   components: {
-    FollowUser
+    FollowUser,
+    CollectArticle,
+    LikeArticle
   },
   props: {
     articleId: {
@@ -315,12 +331,23 @@ export default {
       line-height: 46px;
       color: #a7a7a7;
     }
-    .van-icon {
+    /deep/ .van-icon {
       font-size: 40px;
+    }
+    .comment-icon {
+      top: 2px;
+      color: #777;
       .van-info {
         font-size: 16px;
         background-color: #e22829;
       }
+    }
+    .btn-item {
+      border: none;
+      padding: 0;
+      height: 40px;
+      line-height: 40px;
+      color: #777777
     }
   }
 }
