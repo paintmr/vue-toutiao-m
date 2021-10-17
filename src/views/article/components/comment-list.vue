@@ -1,4 +1,5 @@
 <template>
+<!-- created中调用了this.onLoad()，以便已进入文章详情页就能拿到评论的总数。但van-list有个默认功能：滚动到van-list所在的组件时，自动触发onLoad函数。而针对某条评论的回复也会用到comment-list这个组件。这样就导致在获取某条评论的回复列表时，会很快地先后2次触发onLoad，造成展示的数据重复。为了避免这种bug，设置:immediate-check="false" -->
   <van-list
     v-model="loading"
     :finished="finished"
@@ -6,13 +7,16 @@
     @load="onLoad"
     :error="error"
     error-text="加载失败，请点击重试"
+    :immediate-check="false"
   >
+  <!-- @reply-click：用$event接收子组件comment-item传过来的comment参数，并传递给父组件article/index.vue -->
     <comment-item
       v-for="(comment,index) in list"
       :key="index"
       :comment="comment"
       @update-comment_like_count="comment.like_count = $event"
       @update-comment_is_liking="comment.is_liking = $event"
+      @reply-click="$emit('reply-click', $event)"
     />
   </van-list>
 </template>
@@ -30,14 +34,25 @@ export default {
     source: {
       type: [Number, String, Object],
       required: true
+    },
+    list: {
+      type: Array,
+      default: () => [] // 如果父组件传了值过来，就用父组件的，如果父组件没传值，就用自己的。
+    },
+    type: {
+      type: String,
+      // 自定义prop数据验证，希望type的值要么是a，要么是c，不能是别的。value是type的值。return一个布尔值，true是验证通过，false是验证失败。
+      validator (value) {
+        return ['a', 'c'].includes(value)
+      },
+      default: 'a'// 普通类型的默认值直接访问即可。引用类型的默认值，比如上面的list中的数组，需要通过函数来访问。
     }
   },
   data () {
     return {
-      list: [],
+      // list: [],
       loading: false,
       finished: false,
-      sourceId: '',
       offset: null, // 获取下一页数据的标记
       limit: 10, // 服务器默认不能小于10，否则报错。
       error: false // 是否显示评论列表加载失败
@@ -45,23 +60,17 @@ export default {
   },
   created () {
     // 如果不下拉到文章底部，不会触发onLoad()。如果不触发onLoad，就拿不到评论的条数。这样评论的条数会显示为0，这样显然不合理。所以一加载页面就去触发onLoad
+    // 自己触发onLoad时，不会自动触发loading动画，所以要手动设置一下this.loading = true
+    this.loading = true
     this.onLoad()
   },
   methods: {
     async onLoad () {
-      // 如果传过来的文章id类型是BigNumber对象，且此时this.sourceId是空的，遍历BigNumber对象.c数组（有原来的id拆分的数字组成），把这些数字拼接成1个string（除了类型不是number外，和原来的文章id长得一样），作为文章id参数传递给服务器。
-      if (typeof (this.source) === 'object' && !this.sourceId) {
-        let str = ''
-        this.source.c.forEach(item => {
-          str += '' + item
-        })
-        this.sourceId = str
-      }
       try {
         // 1 请求获取数据
         const { data } = await getComments({
-          type: 'a', // 评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
-          source: this.sourceId ? this.sourceId : this.source, // 文章id或评论id
+          type: this.type, // 评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+          source: this.source.toString(), // 文章id或评论id。
           offset: this.offset, // 获取评论数据的偏移量，值为评论id，表示从此id的数据向后取，不传表示从第一页开始读取数据
           limit: this.limit // 获取的评论数据个数，不传表示采用后端服务设定的默认每页数据量
         })

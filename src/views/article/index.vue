@@ -82,9 +82,12 @@
         <!-- /文章内容 -->
 
         <!-- 文章评论列表 -->
+         <!-- @reply-click：接收孙组件comment-item通过子组件comment-list传过来的comment参数-->
         <comment-list
           :source="article.art_id"
           @onload-success = "totalCommentCount = $event.total_count"
+          :list="commentList"
+          @reply-click="onReplyClick"
         />
         <!-- /文章评论列表 -->
 
@@ -96,6 +99,7 @@
             type="default"
             round
             size="small"
+            @click="isWriteCommentShow=true"
           >写评论</van-button>
           <van-icon
             class="comment-icon"
@@ -145,6 +149,34 @@
       </div>
       <!-- /加载失败：其它位置错误（如网络原因或服务单异常 -->
     </div>
+
+    <!-- 发布评论弹出层(不设置高度，由内容自行撑开) -->
+    <van-popup v-model="isWriteCommentShow" position="bottom">
+      <comment-post
+        :target="article.art_id"
+        @post-comment-success="onPostCommentSuccess"
+      />
+    </van-popup>
+    <!-- /发布评论弹出层 -->
+
+    <!-- 回复评论弹出层。要放在class="main-wrap"这个div外面，因为想让回复评论弹出层占满整个屏幕，而class="main-wrap"这个div为了保证自己不被导航栏遮住，距离顶部有92px。 -->
+    <!-- bug：第一次查看某条评论的回复后，不论点击哪条评论，都会显示第一次查看的评论的回复。 -->
+    <!-- bug原因：vant-popup是懒加载。只有在第一次展示的时候才会渲染里面的内容。之后它的关闭和显示都是在切换内容的显示和隐藏。因为这种设置，后来再打开其它评论的回复弹出层时，不会去请求新的数据，显示的都是第一次点击的回复的数据。 -->
+    <!-- 解决方案：理想：回复弹出的内容随着弹出的打开而渲染最新的内容，随着弹出的关闭而销毁。然而van-popup没有这种功能，所以借助v-if。 -->
+    <!--           v-if条件渲染特点：true渲染元素节点，false不渲染（此时元素被销毁）。给comment-reply加上v-if="isWriteReplyShow"，让它随之渲染和销毁，这样保证每次拿到的都是最新的数据 -->
+    <van-popup
+      v-model="isWriteReplyShow"
+      position="bottom"
+      style="height: 100%;"
+    >
+      <comment-reply
+        v-if="isWriteReplyShow"
+        :comment="currentComment"
+        @close-write-reply-show="isWriteReplyShow = false"
+        @update-comment_reply_count="currentComment.reply_count = $event"
+      />
+    </van-popup>
+    <!-- 回复评论弹出层 -->
   </div>
 </template>
 
@@ -155,6 +187,8 @@ import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
 import CommentList from './components/comment-list'
+import CommentPost from './components/comment-post'
+import CommentReply from './components/comment-reply'
 
 export default {
   name: 'ArticleIndex',
@@ -162,11 +196,19 @@ export default {
     FollowUser,
     CollectArticle,
     LikeArticle,
-    CommentList
+    CommentList,
+    CommentPost,
+    CommentReply
+  },
+  // provide写在export default中任意地方。provide给所有的后代组件提供数据。
+  provide: function () {
+    return {
+      articleId: this.articleId
+    }
   },
   props: {
     articleId: {
-      type: [Number, String, Object], // 如果从文章列表跳转到某篇文章详情，articleId是数字；如果直接输入URL访问文章详情，articleId是字符串。还要考虑到JSONBig.parse(data) 會把超出 JS 安全整數範圍的數字轉為一個 BigNumber 類型的對象的情况。
+      type: [Number, String, Object], // 如果从文章列表跳转到某篇文章详情，articleId是数字；如果直接输入URL访问文章详情，articleId是字符串。还要考虑到JSONBig.parse(data) 會把超出 JS 安全整數範圍的數字轉為一個 BigNumber 類型的對象的情况。这里即便是个巨大的数字，还是个string。
       required: true
     }
   },
@@ -176,7 +218,11 @@ export default {
       loading: true, // 加载中的loading状态
       errStatus: 0, // 失败状态码
       followLoading: false,
-      totalCommentCount: 0
+      totalCommentCount: 0,
+      isWriteCommentShow: false, // 是否显示撰写文章评论弹出层
+      commentList: [], // 评论列表
+      isWriteReplyShow: false, // 是否显示撰写评论的评论弹出层
+      currentComment: {} // 被回复的评论对象
     }
   },
   created () {
@@ -194,6 +240,18 @@ export default {
         // }
 
         this.article = data.data
+
+        // 如果props中接收到的articleId巨大，通过该ID获取到的文章详情中的this.article.art_id就会变成一个BigNumber对象。要处理一下这个对象。
+        // 遍历BigNumber对象.c数组（由原来的id拆分的数字组成），把这些数字拼接成1个string（除了类型不是number外，和原来的文章id长得一样），作为文章id参数传递给服务器，用于后续的各种请求。
+        // if (typeof (this.article.art_id) === 'object') {
+        //   let str = ''
+        //   this.article.art_id.c.forEach(item => {
+        //     str += '' + item
+        //   })
+        //   this.article.art_id = str
+        // }
+        // 上面这些代码等价于this.article.art_id.toString()。在需要用到art_id的时候，直接转就可以了。
+        // console.log(this.article.art_id.toString())
 
         // 初始化图片点击预览
         // 得到数据，渲染画面，这两个步骤之间有时间差。所以立即执行console.log(this.$refs['article-content'])打印出来是undefined。得延迟一下。
@@ -227,6 +285,17 @@ export default {
           })
         }
       })
+    },
+    onPostCommentSuccess (data) {
+      // 关闭弹层
+      this.isWriteCommentShow = false
+      // 刷新评论列表
+      this.commentList.unshift(data.new_obj)
+    },
+    onReplyClick (comment) {
+      this.currentComment = comment
+      // 显示回复评论弹出层
+      this.isWriteReplyShow = true
     }
   }
 }
