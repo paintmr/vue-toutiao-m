@@ -78,3 +78,13 @@ export const deleteFollow = (followTargetId) => {
     }
   })
 }
+
+/**
+ * 获取当前登录用户的个人资料（如果获取当前登录用户的个人资料，不用传参数target；如果要获取别的用户，则要传递参数target）
+ */
+export const getUserProfile = () => {
+  return request({
+    method: 'GET',
+    url: '/v1_0/user/profile'
+  })
+}
