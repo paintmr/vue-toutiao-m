@@ -14,6 +14,7 @@
 
 <script>
 import { updateUserProfile } from '@/api/user'
+import dayjs from 'dayjs'
 
 export default {
   name: 'UpdateBirthday',
@@ -26,24 +27,23 @@ export default {
   data () {
     return {
       minDate: new Date(1900, 0, 1),
-      maxDate: '',
-      currentDate: ''
+      maxDate: new Date(),
+      currentDate: new Date(this.value) // 下面被注释掉的代码(和setDates()相关的)用这一行new Date(this.value)代替即可。
     }
   },
   created () {
-    this.setDates(this.value)
+    // this.setDates(this.value)
   },
   methods: {
-    setDates (currentBirthday) {
-      this.maxDate = new Date()
-      if (currentBirthday) {
-        const currentBirthdayArr = currentBirthday.split('-')
-        // currentBirthdayArr里面的数组成员都是数字类型string。有时有这样的['2019','09', '02']。new Date()里面只能接收前面不带0的数字。把这些字符串进行一下运算，可以将其转换为对应的数字，并且把前面的0去掉
-        this.currentDate = new Date(currentBirthdayArr[0], currentBirthdayArr[1] - 1, currentBirthdayArr[2] - 0)
-      } else {
-        this.currentDate = new Date()
-      }
-    },
+    // setDates (currentBirthday) {
+    //   if (currentBirthday) {
+    //     const currentBirthdayArr = currentBirthday.split('-')
+    //     // currentBirthdayArr里面的数组成员都是数字类型string。有时有这样的['2019','09', '02']。new Date()里面只能接收前面不带0的数字。把这些字符串进行一下运算，可以将其转换为对应的数字，并且把前面的0去掉
+    //     this.currentDate = new Date(currentBirthdayArr[0], currentBirthdayArr[1] - 1, currentBirthdayArr[2] - 0)
+    //   } else {
+    //     this.currentDate = new Date()
+    //   }
+    // },
     async onConfirm (date) {
       this.$toast.loading({
         message: '保存中',
@@ -51,10 +51,13 @@ export default {
         duration: 0 // 持续展示loading。toast提示成功/失败，都会关闭loading
       })
 
-      const birthY = date.getFullYear()
-      const birthM = (date.getMonth() + 1).toString().length === 1 ? ('0' + (date.getMonth() + 1)) : (date.getMonth() + 1) // 给1一位数的补零
-      const birthD = date.getDate().toString().length === 1 ? ('0' + date.getDate()) : date.getDate() // 给1一位数的补零
-      const currentBirthday = `${birthY}-${birthM}-${birthD}`
+      // const birthY = date.getFullYear()
+      // const birthM = (date.getMonth() + 1).toString().length === 1 ? ('0' + (date.getMonth() + 1)) : (date.getMonth() + 1) // 给1一位数的补零
+      // const birthD = date.getDate().toString().length === 1 ? ('0' + date.getDate()) : date.getDate() // 给1一位数的补零
+      // const currentBirthday = `${birthY}-${birthM}-${birthD}`
+
+      // 上面的把date对象转换为字符串的代码，可以用下面这一行代码代替。下面的date也可以写成this.currentDate，那么就不需要在onConfirm()里面传参数date了。
+      const currentBirthday = dayjs(date).format('YYYY-MM-DD')
 
       try {
         if (currentBirthday === this.value) {

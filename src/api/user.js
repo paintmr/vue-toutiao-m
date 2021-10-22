@@ -99,3 +99,14 @@ export const updateUserProfile = data => {
     data
   })
 }
+
+/**
+ * 更新当前登录用户的头像
+ */
+export const updateUserAvatar = data => {
+  return request({
+    method: 'PATCH',
+    url: '/v1_0/user/photo',
+    data
+  })
+}
