@@ -28,24 +28,29 @@
         :source="comment.com_id"
         type="c"
         :list = "commentList"
+        @reply-click="onReplyClick"
+        :isShowingReplyList="isShowingReplyList"
       />
       <!-- /评论的回复列表 -->
     </div>
 
     <!-- 底部发布评论区域 -->
     <div class="post-wrap">
-      <van-button size="small" round class="post-btn" @click="isWriteCommentShow=true">写评论</van-button>
+      <van-button size="small" round class="post-btn" @click="isWriteReplyShow=true">回复层主</van-button>
     </div>
     <!-- /底部发布评论区域 -->
 
-    <!-- 发布评论弹出层(不设置高度，由内容自行撑开) -->
-    <van-popup v-model="isWriteCommentShow" position="bottom">
+    <!-- 撰写评论弹出层(不设置高度，由内容自行撑开) -->
+    <van-popup v-model="isWriteReplyShow" position="bottom">
       <comment-post
+        v-if="isWriteReplyShow"
         :target="comment.com_id"
         @post-comment-success="onPostCommentReplySuccess"
+        :replyTarget="reply.aut_name"
+        @deleteReplyTarget="reply.aut_name=''"
       />
     </van-popup>
-    <!-- /发布评论弹出层 -->
+    <!-- /撰写评论弹出层 -->
   </div>
 </template>
 
@@ -69,8 +74,10 @@ export default {
   },
   data () {
     return {
-      isWriteCommentShow: false,
-      commentList: []
+      isWriteReplyShow: false, // 是否显示撰写回复评论的弹出层
+      commentList: [],
+      reply: {}, // 被回复的reply
+      isShowingReplyList: true // 通过comment-list告诉comment-item，现在展示的是某条comment的reply列表，所以不用在comment-item中显示回复数量
     }
   },
   computed: {},
@@ -79,15 +86,18 @@ export default {
   mounted () {},
   methods: {
     onPostCommentReplySuccess (data) {
-      console.log(this.list)
-      console.log(data)
       // 更新回复数量
       this.comment.reply_count++
       this.$emit('update-comment_reply_count', this.comment.reply_count)
       // 关闭弹层
-      this.isWriteCommentShow = false
+      this.isWriteReplyShow = false
       // 刷新评论列表，把最新回复显示到回复列表顶部。
       this.commentList.unshift(data.new_obj)
+    },
+    onReplyClick (comment) {
+      this.reply = comment
+      // 显示撰写回复评论的弹出层
+      this.isWriteReplyShow = true
     }
   }
 }

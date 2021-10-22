@@ -163,16 +163,16 @@
     <!-- bug：第一次查看某条评论的回复后，不论点击哪条评论，都会显示第一次查看的评论的回复。 -->
     <!-- bug原因：vant-popup是懒加载。只有在第一次展示的时候才会渲染里面的内容。之后它的关闭和显示都是在切换内容的显示和隐藏。因为这种设置，后来再打开其它评论的回复弹出层时，不会去请求新的数据，显示的都是第一次点击的回复的数据。 -->
     <!-- 解决方案：理想：回复弹出的内容随着弹出的打开而渲染最新的内容，随着弹出的关闭而销毁。然而van-popup没有这种功能，所以借助v-if。 -->
-    <!--           v-if条件渲染特点：true渲染元素节点，false不渲染（此时元素被销毁）。给comment-reply加上v-if="isWriteReplyShow"，让它随之渲染和销毁，这样保证每次拿到的都是最新的数据 -->
+    <!--           v-if条件渲染特点：true渲染元素节点，false不渲染（此时元素被销毁）。给comment-reply加上v-if="isRepliesShow"，让它随之渲染和销毁，这样保证每次拿到的都是最新的数据 -->
     <van-popup
-      v-model="isWriteReplyShow"
+      v-model="isRepliesShow"
       position="bottom"
       style="height: 100%;"
     >
       <comment-reply
-        v-if="isWriteReplyShow"
+        v-if="isRepliesShow"
         :comment="currentComment"
-        @close-write-reply-show="isWriteReplyShow = false"
+        @close-write-reply-show="isRepliesShow = false"
         @update-comment_reply_count="currentComment.reply_count = $event"
       />
     </van-popup>
@@ -221,7 +221,7 @@ export default {
       totalCommentCount: 0,
       isWriteCommentShow: false, // 是否显示撰写文章评论弹出层
       commentList: [], // 评论列表
-      isWriteReplyShow: false, // 是否显示撰写评论的评论弹出层
+      isRepliesShow: false, // 是否显示该条评论回复列表的弹出层
       currentComment: {} // 被回复的评论对象
     }
   },
@@ -240,7 +240,6 @@ export default {
         // }
 
         this.article = data.data
-
         // 如果props中接收到的articleId巨大，通过该ID获取到的文章详情中的this.article.art_id就会变成一个BigNumber对象。要处理一下这个对象。
         // 遍历BigNumber对象.c数组（由原来的id拆分的数字组成），把这些数字拼接成1个string（除了类型不是number外，和原来的文章id长得一样），作为文章id参数传递给服务器，用于后续的各种请求。
         // if (typeof (this.article.art_id) === 'object') {
@@ -286,16 +285,18 @@ export default {
         }
       })
     },
-    onPostCommentSuccess (data) {
+    async onPostCommentSuccess (dataaa) {
       // 关闭弹层
       this.isWriteCommentShow = false
       // 刷新评论列表
-      this.commentList.unshift(data.new_obj)
+      this.commentList.unshift(dataaa.new_obj)
+      // 更新评论总条数
+      this.totalCommentCount = this.commentList.length
     },
     onReplyClick (comment) {
       this.currentComment = comment
       // 显示回复评论弹出层
-      this.isWriteReplyShow = true
+      this.isRepliesShow = true
     }
   }
 }

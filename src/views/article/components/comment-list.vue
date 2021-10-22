@@ -9,7 +9,7 @@
     error-text="加载失败，请点击重试"
     :immediate-check="false"
   >
-  <!-- @reply-click：用$event接收子组件comment-item传过来的comment参数，并传递给父组件article/index.vue -->
+  <!-- @reply-click：用$event接收子组件comment-item传过来的comment参数，并传递给父组件article/index.vue或者comment-reply.vue -->
     <comment-item
       v-for="(comment,index) in list"
       :key="index"
@@ -17,6 +17,7 @@
       @update-comment_like_count="comment.like_count = $event"
       @update-comment_is_liking="comment.is_liking = $event"
       @reply-click="$emit('reply-click', $event)"
+      :isShowingReplyList="isShowingReplyList"
     />
   </van-list>
 </template>
@@ -46,6 +47,10 @@ export default {
         return ['a', 'c'].includes(value)
       },
       default: 'a'// 普通类型的默认值直接访问即可。引用类型的默认值，比如上面的list中的数组，需要通过函数来访问。
+    },
+    // 接收父组件comment-reply传过来的参数，子组件告诉comment-item，现在展示的是某条comment的reply列表，所以不用在comment-item中显示回复数量
+    isShowingReplyList: {
+      type: Boolean
     }
   },
   data () {
@@ -74,7 +79,6 @@ export default {
           offset: this.offset, // 获取评论数据的偏移量，值为评论id，表示从此id的数据向后取，不传表示从第一页开始读取数据
           limit: this.limit // 获取的评论数据个数，不传表示采用后端服务设定的默认每页数据量
         })
-
         // 2 将数据添加到列表中
         const { results } = data.data // 这里如果要取出total_count必须注意：total_count是服务器返回的数据的命名，这里不允许这样命名，得改成驼峰法totalCount
         this.list.push(...results)

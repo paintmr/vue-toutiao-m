@@ -7,7 +7,7 @@
       autosize
       type="textarea"
       maxlength="50"
-      placeholder="请输入留言"
+      :placeholder="replyTarget ?  '回复'+replyTarget+'：' : '请输入留言'"
       show-word-limit
     />
     <van-button
@@ -35,6 +35,9 @@ export default {
     target: {
       type: [Number, String, Object],
       required: true
+    },
+    replyTarget: {
+      type: [Number, String]
     }
   },
   data () {
@@ -56,6 +59,12 @@ export default {
         duration: 0 // 持续展示loading组件的时间，默认 2000毫秒,  0表示持续展示不关闭。同时，新toast调用时，会关闭老toast
       })
       try {
+        // 如果是回复评论：
+        if (this.replyTarget) {
+          this.message = `回复${this.replyTarget}：${this.message}`
+          // 每次提交回复后，要把replyTarget置空，否则在comment-reply中回复comment时，会带上这个replyTarget
+          this.$emit('deleteReplyTarget')
+        }
         // 向服务器提交新增的评论
         const { data } = await addComment({
           target: this.target.toString(),

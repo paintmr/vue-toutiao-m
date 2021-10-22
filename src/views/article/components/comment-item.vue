@@ -30,7 +30,7 @@
           class="reply-btn"
           round
           @click="$emit('reply-click', comment)"
-        >回复 {{ comment.reply_count }}</van-button>
+        >回复 {{ isShowingReplyList ? '' : comment.reply_count }}</van-button>
       </div>
     </div>
   </van-cell>
@@ -46,6 +46,10 @@ export default {
     comment: {
       type: Object,
       required: true
+    },
+    // 接收祖父组件comment-reply通过comment-list传过来的参数，如果为true，那么现在展示的是某条comment的reply列表，所以不用在comment-item中显示回复数量
+    isShowingReplyList: {
+      type: Boolean
     }
   },
   data () {
