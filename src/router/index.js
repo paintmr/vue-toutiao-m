@@ -21,16 +21,16 @@ const routes = [
         name: 'home',
         component: () => import('@/views/home')
       },
-      {
-        path: '/qa',
-        name: 'qa',
-        component: () => import('@/views/qa')
-      },
-      {
-        path: '/video',
-        name: 'video',
-        component: () => import('@/views/video')
-      },
+      // {
+      //   path: '/qa',
+      //   name: 'qa',
+      //   component: () => import('@/views/qa')
+      // },
+      // {
+      //   path: '/video',
+      //   name: 'video',
+      //   component: () => import('@/views/video')
+      // },
       {
         path: '/my',
         name: 'my',
@@ -53,6 +53,11 @@ const routes = [
     path: '/user/profile',
     name: 'user-profile',
     component: () => import('@/views/user-profile')
+  },
+  {
+    path: '/user/:userId',
+    name: 'user-others',
+    component: () => import('@/views/user-others')
   }
 ]
 

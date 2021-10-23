@@ -11,14 +11,14 @@
         <i slot="icon" class="vuetoutiao vuetoutiao-shouye"></i>
         <span class="text">首页</span>
       </van-tabbar-item>
-      <van-tabbar-item replace to="/qa">
+      <!-- <van-tabbar-item replace to="/qa">
         <i slot="icon" class="vuetoutiao vuetoutiao-wenda"></i>
         <span class="text">问答</span>
       </van-tabbar-item>
       <van-tabbar-item replace to="/video">
         <i slot="icon" class="vuetoutiao vuetoutiao-shipin"></i>
         <span class="text">视频</span>
-      </van-tabbar-item>
+      </van-tabbar-item> -->
       <van-tabbar-item replace to="/my">
         <i slot="icon" class="vuetoutiao vuetoutiao-wode"></i>
         <span class="text">{{ $store.state.user ? '我的' : '未登录' }}</span>

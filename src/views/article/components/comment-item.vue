@@ -6,10 +6,11 @@
       round
       fit="cover"
       :src="comment.aut_photo"
+      @click="toUserInfo"
     />
 
     <div slot="title" class="title-wrap">
-      <div class="user-name">{{ comment.aut_name }}</div>
+      <div class="user-name" @click="toUserInfo">{{ comment.aut_name }}</div>
       <van-button
         class="like-btn"
         :class="{
@@ -83,6 +84,9 @@ export default {
         this.$toast('操作失败，请重试')
       }
       this.commentLikeLoading = false
+    },
+    toUserInfo () {
+      this.$router.push({ name: 'user-others', params: { userId: this.comment.aut_id } })
     }
   }
 }
