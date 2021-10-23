@@ -9,59 +9,61 @@
     />
     <!-- /导航栏 -->
 
-    <!-- 用户信息 -->
-    <div class="user-info-wrap">
-      <div class="user-info-first-line">
-        <van-image
-          round
-          fit="cover"
-          class="avatar"
-          :src="user.photo"
-        />
-        <div class="user-info">
-          <div class="user-info-items">
-            <div class="user-info-item">
-              <span class="user-info-number">{{ user.art_count }}</span>
-              <span class="user-info-text">发布</span>
+    <div v-if="user.name">
+      <!-- 用户信息 -->
+      <div class="user-info-wrap">
+        <div class="user-info-first-line">
+          <van-image
+            round
+            fit="cover"
+            class="avatar"
+            :src="user.photo"
+          />
+          <div class="user-info">
+            <div class="user-info-items">
+              <div class="user-info-item">
+                <span class="user-info-number">{{ user.art_count }}</span>
+                <span class="user-info-text">发布</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-number">{{ user.follow_count }}</span>
+                <span class="user-info-text">关注</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-number">{{ user.fans_count }}</span>
+                <span class="user-info-text">粉丝</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-number">{{ user.like_count }}</span>
+                <span class="user-info-text">获赞</span>
+              </div>
             </div>
-            <div class="user-info-item">
-              <span class="user-info-number">{{ user.follow_count }}</span>
-              <span class="user-info-text">关注</span>
+            <div class="btn-wrap">
+              <!-- <van-button
+                class="follow-btn"
+                @click="follow"
+              >关注</van-button> -->
+              <follow-user
+                v-model="user.is_following"
+                class="follow-btn"
+                :user-id="user.id"
+              />
             </div>
-            <div class="user-info-item">
-              <span class="user-info-number">{{ user.fans_count }}</span>
-              <span class="user-info-text">粉丝</span>
-            </div>
-            <div class="user-info-item">
-              <span class="user-info-number">{{ user.like_count }}</span>
-              <span class="user-info-text">获赞</span>
-            </div>
-          </div>
-          <div class="btn-wrap">
-            <!-- <van-button
-              class="follow-btn"
-              @click="follow"
-            >关注</van-button> -->
-            <follow-user
-              v-model="user.is_following"
-              class="follow-btn"
-              :user-id="user.id"
-            />
           </div>
         </div>
-      </div>
 
-      <div class="user-labels-wrap">
-        <div class="user-label">
-          <span class="user-label-l">简介：</span>
-          <span class="user-label-r">{{ user.certi }}</span>
+        <div class="user-labels-wrap">
+          <div class="user-label">
+            <span class="user-label-l">简介：</span>
+            <span class="user-label-r">{{ user.certi }}</span>
+          </div>
         </div>
       </div>
+      <!-- /用户信息 -->
+
+      <!-- 用户文章列表 -->
+      <!-- /用户文章列表 -->
     </div>
-    <!-- /用户信息 -->
-
-    <!-- 用户文章列表 -->
-    <!-- /用户文章列表 -->
   </div>
 </template>
 
@@ -85,10 +87,8 @@ export default {
   methods: {
     async loadUser () {
       const userId = this.$route.params.userId.toString()
-      console.log(userId)
       try {
         const { data } = await getUserById(userId)
-        console.log(data)
         this.user = data.data
       } catch (err) {
         this.$toast.fail('获取用户数据失败')

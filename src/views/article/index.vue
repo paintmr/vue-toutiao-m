@@ -24,17 +24,16 @@
 
         <!-- 用户信息 -->
         <van-cell class="user-info" center :border="false">
-          <div @click="toUserInfo">
-            <van-image
-              class="avatar"
-              slot="icon"
-              round
-              fit="cover"
-              :src="article.aut_photo"
-            />
-            <div slot="title" class="user-name">{{ article.aut_name }}</div>
-            <div slot="label" class="publish-date">{{ article.pubdate | relativeTime}}</div>
-          </div>
+          <van-image
+            class="avatar"
+            slot="icon"
+            round
+            fit="cover"
+            :src="article.aut_photo"
+            @click="toUserInfo"
+          />
+          <div slot="title" class="user-name" @click="toUserInfo">{{ article.aut_name }}</div>
+          <div slot="label" class="publish-date">{{ article.pubdate | relativeTime}}</div>
 
           <!-- 关注和取关源代码 -->
           <!-- <van-button
@@ -301,7 +300,7 @@ export default {
       this.isRepliesShow = true
     },
     toUserInfo () {
-      this.$router.push({ name: 'user-others', params: { userId: this.article.art_id } })
+      this.$router.push({ name: 'user-others', params: { userId: this.article.aut_id } })
     }
   }
 }
