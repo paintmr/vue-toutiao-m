@@ -55,13 +55,14 @@
         <div class="user-labels-wrap">
           <div class="user-label">
             <span class="user-label-l">简介：</span>
-            <span class="user-label-r">{{ user.certi }}</span>
+            <span class="user-label-r">{{ user.certi ? user.certi : '木有自我介绍' }}</span>
           </div>
         </div>
       </div>
       <!-- /用户信息 -->
 
       <!-- 用户文章列表 -->
+      <user-article-list :userId="user.id" :userName="user.name" />
       <!-- /用户文章列表 -->
     </div>
   </div>
@@ -70,11 +71,13 @@
 <script>
 import { getUserById } from '@/api/user'
 import FollowUser from '@/components/follow-user'
+import UserArticleList from './components/user-article-list'
 
 export default {
   name: 'OtherUsers',
   components: {
-    FollowUser
+    FollowUser,
+    UserArticleList
   },
   data () {
     return {
@@ -100,6 +103,7 @@ export default {
 
 <style scoped lang="less">
 .user-info-wrap{
+  margin-bottom: 10px;
   .user-info-first-line {
     display: flex;
     margin-bottom: 10px;

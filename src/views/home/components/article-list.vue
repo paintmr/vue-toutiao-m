@@ -34,7 +34,7 @@ export default {
   data () {
     return {
       list: [], // 存储列表数据的数组
-      loading: false, // 控制 加载中 loading 状态
+      loading: false, // 控制加载中 loading 状态
       finished: false, // 控制数据加载结束的状态
       timestamp: null, // 请求获取下一页数据的时间戳
       error: false, // 控制列表加载失败的提示状态
@@ -98,6 +98,7 @@ export default {
         // }
         // 2 将数据追加到列表的顶部
         const { results } = data.data
+        // 导师把下拉刷新的数据放到了列表最顶部，但是我觉得应该用push，放到列表最底部，因为onLoad自动加载的时候，新请求的数据都是放在页面最底部的。
         this.list.unshift(...results)
         // 3 更新下拉刷新成功提示文本
         this.refreshSuccessText = `刷新成功，更新了${results.length}条数据`

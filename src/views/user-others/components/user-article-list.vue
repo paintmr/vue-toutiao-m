@@ -1,0 +1,148 @@
+<template>
+  <div class="user-article-list">
+    <van-pull-refresh v-model="refreshing" @refresh="onRefresh" :success-text="refreshSuccessText">
+      <van-list
+        v-model="loading"
+        :finished="finished"
+        finished-text="没有更多文章了"
+        @load="onLoad"
+        :error.sync="error"
+        error-text="请求失败，点击重新加载"
+      >
+        <article-item  v-for="(article, index) in list" :key="index" :article="article" />
+      </van-list>
+    </van-pull-refresh>
+  </div>
+</template>
+
+<script>
+import { getUserArticlesByUserId } from '@/api/article'
+import ArticleItem from '@/components/article-item'
+
+export default {
+  name: 'UserArticleList',
+  components: {
+    ArticleItem
+  },
+  props: {
+    userId: {
+      type: [Number, String, Object],
+      required: true
+    },
+    userName: {
+      type: String,
+      required: true
+    }
+  },
+  data () {
+    return {
+      list: [], // 存储用户文章列表的数组
+      defaultList: [
+        {
+          art_id: 901823,
+          title: '天朗气清',
+          aut_id: this.userId,
+          aut_name: this.userName,
+          comm_count: 2,
+          pubdate: '2020-09-13 08:09:33',
+          cover: {
+            type: 0
+          },
+          like_count: 5,
+          collect_count: 9,
+          is_liking: 8
+        },
+        {
+          art_id: 901829,
+          title: '惠风和畅',
+          aut_id: this.userId,
+          aut_name: this.userName,
+          comm_count: 5,
+          pubdate: '2021-03-25 11:08:55',
+          cover: {
+            type: 0
+          },
+          like_count: 7,
+          collect_count: 3,
+          is_liking: 6
+        }
+      ], // 测试数据，如果返回的list为空，就显示这个
+      loading: false, // 控制加载中 loading 状态
+      finished: false, // 控制数据加载结束的状态
+      error: false, // 控制列表加载失败的提示状态
+      refreshing: false, // 控制下拉刷新的loading状态
+      refreshSuccessText: '刷新数据成功', // 下拉刷新成功提示文本
+      page: 1, // 用户文章列表页数，默认1
+      per_page: 10 // 用户文章列表每页数量
+    }
+  },
+  methods: {
+    // 初始化或者向上拉屏幕的时候，会触发onLoad，组件自动把loading设置为true。
+    // List初始化后触发一次onLoad事件，用于加载第一屏的数据。如果一次请求加载的数据条数较少，以至于数据无法铺满屏幕，List会继续触发onLoad事件，直到内容铺满屏幕或者数据全部加载完成。
+    async onLoad () {
+      try {
+        // 1 发起请求，获取数据
+        const params = {
+          page: this.page,
+          per_page: this.per_page
+        }
+        const { data } = await getUserArticlesByUserId(this.userId.toString(), params)
+        const { results } = data.data
+
+        // 2 把请求的结果放到list数组中
+        // ...是数组的展开操作符，它会把数组元素一个一个拿出来，然后再push进去
+        if (results.length) {
+          this.list.push(...results)
+        } else {
+          this.list.push(...this.defaultList)
+        }
+
+        // 3 加载状态结束
+        // 数据加载结束之后要把加载状态设置为结束
+        // loading设置为false以后才能触发下一次的加载
+        this.loading = false
+
+        // 4 判断数据是否全部加载完成
+        if (results.length) {
+          // 更新获取的页数
+          this.page++
+        } else {
+          // 如果数据全部请求完毕，把finished设置为true，之后不再加载更多数据。
+          this.finished = true
+        }
+      } catch (err) {
+        // 提示错误
+        this.error = true
+        this.loading = false
+      }
+    },
+    // 下拉刷新时会触发onRefresh函数。系统自动把refreshing设置为true
+    async onRefresh () {
+      try {
+        // 1 请求获取数据
+        const params = {
+          page: this.page,
+          per_page: this.per_page
+        }
+        const { data } = await getUserArticlesByUserId(this.userId.toString(), params)
+        const { results } = data.data
+
+        // 2 把请求的结果放到list数组中
+        this.list.push(...results)
+
+        // 3 更新下拉刷新成功提示文本
+        this.refreshSuccessText = `刷新成功，更新了${results.length}条数据`
+
+        // 4 关闭下拉刷新的loading状态
+        this.refreshing = false
+      } catch (err) {
+        this.refreshSuccessText = '刷新失败'
+        this.refreshing = false
+      }
+    }
+  }
+}
+</script>
+
+<style scoped lang="less">
+</style>
