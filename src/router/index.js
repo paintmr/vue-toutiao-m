@@ -39,23 +39,28 @@ const routes = [
     ]
   },
   {
-    path: '/search',
+    path: '/search', // 搜索页面
     name: 'search',
     component: () => import('@/views/search')
   },
   {
-    path: '/article/:articleId',
+    path: '/article/:articleId', // 文章详情页面
     name: 'article',
     component: () => import('@/views/article'),
     props: true // 开启props传参，即把路由参数映射到组件的props数据中
   },
   {
-    path: '/user/profile',
+    path: '/user/profile', // 查看与编辑自己的信息。
     name: 'user-profile',
     component: () => import('@/views/user-profile')
   },
   {
-    path: '/user/:userId',
+    path: '/user/followingfans', // 查看关注/粉丝页面
+    name: 'followeringfans',
+    component: () => import('@/views/follow-fan-list')
+  },
+  {
+    path: '/user/:userId', // 去到别的用户信息页面   /user/:userId必须放在所有以/user/开头的路由后面，否则进入这些路由时，会进入/user/:userId导向的页面
     name: 'user-others',
     component: () => import('@/views/user-others')
   }

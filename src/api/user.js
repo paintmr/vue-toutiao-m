@@ -120,3 +120,25 @@ export const getUserById = userId => {
     url: `/v1_0/users/${userId}`
   })
 }
+
+/**
+ * 获取用户的关注列表
+ */
+export const getFollowList = params => {
+  return request({
+    method: 'GET',
+    url: '/v1_0/user/followings',
+    params
+  })
+}
+
+/**
+ * 获取用户的粉丝列表
+ */
+export const getFanList = params => {
+  return request({
+    method: 'GET',
+    url: '/v1_0/user/followers',
+    params
+  })
+}

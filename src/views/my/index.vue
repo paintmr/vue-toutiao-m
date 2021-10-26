@@ -26,11 +26,11 @@
           <span class="count">{{ userInfo.art_count }}</span>
           <span class="text">头条</span>
         </div>
-        <div class="data-item">
+        <div class="data-item" @click="toFollowersFansPage(0)">
           <span class="count">{{ userInfo.follow_count }}</span>
           <span class="text">关注</span>
         </div>
-        <div class="data-item">
+        <div class="data-item" @click="toFollowersFansPage(1)">
           <span class="count">{{ userInfo.fans_count }}</span>
           <span class="text">粉丝</span>
         </div>
@@ -80,6 +80,7 @@
 <script>
 import { mapState } from 'vuex'
 import { getUserInfo } from '@/api/user'
+
 export default {
   name: 'MyIndex',
   data () {
@@ -119,6 +120,9 @@ export default {
         // on cancel
         console.log('取消执行这里')
       })
+    },
+    toFollowersFansPage (activeTab) {
+      this.$router.push({ name: 'followeringfans', params: { userId: this.userInfo.id, activeTab: activeTab } })
     }
   }
 }
