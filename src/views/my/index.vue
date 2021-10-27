@@ -122,7 +122,7 @@ export default {
       })
     },
     toFollowersFansPage (activeTab) {
-      this.$router.push({ name: 'followeringfans', params: { userId: this.userInfo.id, activeTab: activeTab } })
+      this.$router.push({ name: 'followeringfans', params: { activeTab: activeTab } })
     }
   }
 }

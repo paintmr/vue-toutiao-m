@@ -5,7 +5,7 @@
       class="page-nav-bar"
       :title="user.name"
       left-arrow
-      @click-left="$router.back()"
+      @click-left="goBack"
     />
     <!-- /导航栏 -->
 
@@ -95,6 +95,13 @@ export default {
         this.user = data.data
       } catch (err) {
         this.$toast.fail('获取用户数据失败')
+      }
+    },
+    goBack () {
+      if (this.$route.params.tabIndex === 1) {
+        this.$router.push({ name: 'followeringfans', params: { activeTab: 1 } })
+      } else {
+        this.$router.back()
       }
     }
   }

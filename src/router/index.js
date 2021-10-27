@@ -57,7 +57,7 @@ const routes = [
   {
     path: '/user/followingfans', // 查看关注/粉丝页面
     name: 'followeringfans',
-    component: () => import('@/views/follow-fan-list')
+    component: () => import('@/views/following-fan-list')
   },
   {
     path: '/user/:userId', // 去到别的用户信息页面   /user/:userId必须放在所有以/user/开头的路由后面，否则进入这些路由时，会进入/user/:userId导向的页面

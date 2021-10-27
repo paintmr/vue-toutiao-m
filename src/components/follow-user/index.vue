@@ -48,10 +48,10 @@ export default {
       try {
         if (this.isFollowed) {
           // 已关注，取消关注
-          await deleteFollow(this.userId)
+          await deleteFollow(this.userId.toString())
         } else {
           // 未关注，添加关注
-          await addFollow(this.userId)
+          await addFollow(this.userId.toString())
         }
         // this.$emit('input', !this.value)
         this.$emit('update-is_followed', !this.isFollowed)
@@ -61,7 +61,7 @@ export default {
         if (err.response && err.response.status === 400) {
           message = '你不能关注你自己'
         }
-        this.$toast(message)
+        this.$toast.fail(message)
       }
       this.loading = false // 关闭关注按钮的loading状态
     }

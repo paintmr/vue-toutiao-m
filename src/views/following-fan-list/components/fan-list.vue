@@ -1,6 +1,5 @@
 <template>
   <div class="Fan-list">
-    fan-list
     <van-pull-refresh
       v-model="refreshing"
       @refresh="onRefresh"
@@ -14,7 +13,14 @@
         :error.sync="error"
         error-text="请求失败，点击重新加载"
       >
-        <van-cell v-for="(user, index) in list" :key="index" :title="user.name" />
+        <following-fan-item
+          v-for="(user, index) in list"
+          :key="index"
+          :user="user"
+          :tabIndex=1
+          @update-mutual_follow="user.mutual_follow=$event"
+          @update-fans_count="user.fans_count=$event"
+        />
       </van-list>
     </van-pull-refresh>
   </div>
@@ -22,9 +28,13 @@
 
 <script>
 import { getFanList } from '@/api/user'
+import FollowingFanItem from './following-fan-item'
 
 export default {
   name: 'FanList',
+  components: {
+    FollowingFanItem
+  },
   data () {
     return {
       list: [],
@@ -34,39 +44,7 @@ export default {
       refreshing: false,
       refreshSuccessText: '刷新数据成功',
       page: 1, // 用户列表页数，默认1
-      per_page: 10, // 用户列表每页用户数量
-      defaultFans: [
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' },
-        { name: 'qaz' }
-      ]
+      per_page: 10 // 用户列表每页用户数量
     }
   },
   created () {
@@ -84,11 +62,7 @@ export default {
 
         // 2 把请求的结果放到list数组中
         // ...是数组的展开操作符，它会把数组元素一个一个拿出来，然后再push进去
-        if (results.length) {
-          this.list.push(...results)
-        } else {
-          this.list.push(...this.defaultFans)
-        }
+        this.list.push(...results)
 
         // 3 加载状态结束
         // 数据加载结束之后要把加载状态设置为结束

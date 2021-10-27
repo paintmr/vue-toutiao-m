@@ -1,6 +1,5 @@
 <template>
   <div class="following-list">
-    followling-list
     <van-pull-refresh
       v-model="refreshing"
       @refresh="onRefresh"
@@ -14,7 +13,13 @@
         :error.sync="error"
         error-text="请求失败，点击重新加载"
       >
-        <van-cell v-for="(user, index) in list" :key="index" :title="user.name" />
+        <following-fan-item
+          v-for="(user, index) in list"
+          :key="index"
+          :user="user"
+          :tabIndex=0
+          @update-following-list="$emit('update-following-list')"
+        />
       </van-list>
     </van-pull-refresh>
   </div>
@@ -22,9 +27,13 @@
 
 <script>
 import { getFollowList } from '@/api/user'
+import FollowingFanItem from './following-fan-item'
 
 export default {
   name: 'FollowingList',
+  components: {
+    FollowingFanItem
+  },
   data () {
     return {
       list: [],
