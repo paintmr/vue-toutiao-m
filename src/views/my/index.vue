@@ -17,7 +17,7 @@
           <van-button
             size="mini"
             round
-            to="/user/profile"
+            to="/my/profile"
           >编辑资料</van-button>
         </div>
       </div>
@@ -26,11 +26,11 @@
           <span class="count">{{ userInfo.art_count }}</span>
           <span class="text">头条</span>
         </div>
-        <div class="data-item" @click="toFollowersFansPage(0)">
+        <div class="data-item" @click="toFollowingFansPage(0)">
           <span class="count">{{ userInfo.follow_count }}</span>
           <span class="text">关注</span>
         </div>
-        <div class="data-item" @click="toFollowersFansPage(1)">
+        <div class="data-item" @click="toFollowingFansPage(1)">
           <span class="count">{{ userInfo.fans_count }}</span>
           <span class="text">粉丝</span>
         </div>
@@ -53,7 +53,7 @@
 
     <!-- 宫格导航 -->
     <van-grid clickable :column-num="3" class="grid-nav mb-9">
-      <van-grid-item class="grid-item">
+      <van-grid-item class="grid-item" to="/my/collection">
         <i slot="icon" class="vuetoutiao vuetoutiao-shoucang"></i>
         <span slot="text" class="text">收藏</span>
       </van-grid-item>
@@ -70,8 +70,14 @@
 
     <!-- 单元格 -->
     <!-- is-link默认带有clickable的效果 -->
-    <van-cell title="消息通知" is-link />
-    <van-cell title="小智同学" is-link class="mb-9"/>
+    <!-- :to="{ name: 'a' }" -->
+    <van-cell title="小智同学" is-link to="/my/chatrobot" />
+    <van-cell
+      title="系统设置"
+      is-link
+      class="mb-9"
+      to="/my/setting"
+    />
     <van-cell v-if="user" class="logout-cell" clickable title="退出登录" @click="onLogout" />
     <!-- /单元格 -->
   </div>
@@ -121,7 +127,7 @@ export default {
         console.log('取消执行这里')
       })
     },
-    toFollowersFansPage (activeTab) {
+    toFollowingFansPage (activeTab) {
       this.$router.push({ name: 'followeringfans', params: { activeTab: activeTab } })
     }
   }

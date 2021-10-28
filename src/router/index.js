@@ -21,16 +21,6 @@ const routes = [
         name: 'home',
         component: () => import('@/views/home')
       },
-      // {
-      //   path: '/qa',
-      //   name: 'qa',
-      //   component: () => import('@/views/qa')
-      // },
-      // {
-      //   path: '/video',
-      //   name: 'video',
-      //   component: () => import('@/views/video')
-      // },
       {
         path: '/my',
         name: 'my',
@@ -50,14 +40,29 @@ const routes = [
     props: true // 开启props传参，即把路由参数映射到组件的props数据中
   },
   {
-    path: '/user/profile', // 查看与编辑自己的信息。
-    name: 'user-profile',
-    component: () => import('@/views/user-profile')
+    path: '/my/profile', // 查看与编辑自己的信息。
+    name: 'myprofile',
+    component: () => import('@/views/my-profile')
   },
   {
-    path: '/user/followingfans', // 查看关注/粉丝页面
+    path: '/my/followingfans', // 查看关注/粉丝页面
     name: 'followeringfans',
-    component: () => import('@/views/following-fan-list')
+    component: () => import('@/views/my-following-fan-list')
+  },
+  {
+    path: '/my/collection', // 收藏
+    name: 'collection',
+    component: () => import('@/views/my-collection')
+  },
+  {
+    path: '/my/chatrobot', // 聊天机器人
+    name: 'chat-robot',
+    component: () => import('@/views/chat-robot')
+  },
+  {
+    path: '/my/setting', // 系统设置
+    name: 'mysetting',
+    component: () => import('@/views/my-setting')
   },
   {
     path: '/user/:userId', // 去到别的用户信息页面   /user/:userId必须放在所有以/user/开头的路由后面，否则进入这些路由时，会进入/user/:userId导向的页面

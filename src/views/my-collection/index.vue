@@ -1,10 +1,10 @@
 <template>
-  <div class="video-container">视频</div>
+  <div class="collection">收藏</div>
 </template>
 
 <script>
 export default {
-  name: 'VideoIndex'
+  name: 'Collection'
 }
 </script>
 

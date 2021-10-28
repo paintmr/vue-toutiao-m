@@ -16,81 +16,85 @@
       </div>
       <!-- /加载中 -->
 
-      <!-- 加载完成-文章详情 -->
-      <div v-else-if="article.title" class="article-detail">
-        <!-- 文章标题 -->
-        <h1 class="article-title">{{ article.title }}</h1>
-        <!-- /文章标题 -->
+      <!-- 加载完成（当拿到了文章详情数据article以后，才开始加载文章详情和底部区域的组件） -->
+      <div v-else-if="article.title" class="article-detail-bottom-wrap">
+        <!-- 文章详情 -->
+        <div class="article-detail">
+          <!-- 文章标题 -->
+          <h1 class="article-title">{{ article.title }}</h1>
+          <!-- /文章标题 -->
 
-        <!-- 用户信息 -->
-        <van-cell class="user-info" center :border="false">
-          <van-image
-            class="avatar"
-            slot="icon"
-            round
-            fit="cover"
-            :src="article.aut_photo"
-            @click="toUserInfo"
+          <!-- 用户信息 -->
+          <van-cell class="user-info" center :border="false">
+            <van-image
+              class="avatar"
+              slot="icon"
+              round
+              fit="cover"
+              :src="article.aut_photo"
+              @click="toUserInfo"
+            />
+            <div slot="title" class="user-name" @click="toUserInfo">{{ article.aut_name }}</div>
+            <div slot="label" class="publish-date">{{ article.pubdate | relativeTime}}</div>
+
+            <!-- 关注和取关源代码 -->
+            <!-- <van-button
+              v-if="article.is_followed"
+              class="follow-btn"
+              round
+              size="small"
+              @click="onFollow"
+              :loading="followLoading"
+            >已关注</van-button>
+            <van-button
+              v-else
+              class="follow-btn"
+              type="info"
+              color="#3296fa"
+              round
+              size="small"
+              icon="plus"
+              @click="onFollow"
+              :loading="followLoading"
+            >关注</van-button> -->
+
+            <!-- 组件化之后的关注和取关代码 -->
+            <!-- <follow-user
+              :is-followed="article.is_followed"
+              class="follow-btn"
+              :user-id="article.aut_id"
+              @update-is_followed="article.is_followed = $event"
+            /> -->
+
+            <!-- v-model的关注和取关代码 -->
+            <follow-user
+              v-model="article.is_followed"
+              class="follow-btn"
+              :user-id="article.aut_id"
+            />
+          </van-cell>
+          <!-- /用户信息 -->
+
+          <!-- 文章内容 -->
+          <div
+            class="article-content markdown-body"
+            v-html="article.content"
+            ref="article-content"
+          ></div>
+          <van-divider>正文结束</van-divider>
+          <!-- /文章内容 -->
+
+          <!-- 文章评论列表 -->
+          <!-- @reply-click：接收孙组件comment-item通过子组件comment-list传过来的comment参数-->
+          <comment-list
+            :source="article.art_id"
+            @onload-success = "totalCommentCount = $event.total_count"
+            :list="commentList"
+            @reply-click="onReplyClick"
           />
-          <div slot="title" class="user-name" @click="toUserInfo">{{ article.aut_name }}</div>
-          <div slot="label" class="publish-date">{{ article.pubdate | relativeTime}}</div>
-
-          <!-- 关注和取关源代码 -->
-          <!-- <van-button
-            v-if="article.is_followed"
-            class="follow-btn"
-            round
-            size="small"
-            @click="onFollow"
-            :loading="followLoading"
-          >已关注</van-button>
-          <van-button
-            v-else
-            class="follow-btn"
-            type="info"
-            color="#3296fa"
-            round
-            size="small"
-            icon="plus"
-            @click="onFollow"
-            :loading="followLoading"
-          >关注</van-button> -->
-
-          <!-- 组件化之后的关注和取关代码 -->
-          <!-- <follow-user
-            :is-followed="article.is_followed"
-            class="follow-btn"
-            :user-id="article.aut_id"
-            @update-is_followed="article.is_followed = $event"
-          /> -->
-
-          <!-- v-model的关注和取关代码 -->
-          <follow-user
-            v-model="article.is_followed"
-            class="follow-btn"
-            :user-id="article.aut_id"
-          />
-        </van-cell>
-        <!-- /用户信息 -->
-
-        <!-- 文章内容 -->
-        <div
-          class="article-content markdown-body"
-          v-html="article.content"
-          ref="article-content"
-        ></div>
-        <van-divider>正文结束</van-divider>
-        <!-- /文章内容 -->
-
-        <!-- 文章评论列表 -->
-         <!-- @reply-click：接收孙组件comment-item通过子组件comment-list传过来的comment参数-->
-        <comment-list
-          :source="article.art_id"
-          @onload-success = "totalCommentCount = $event.total_count"
-          :list="commentList"
-          @reply-click="onReplyClick"
-        />
-        <!-- /文章评论列表 -->
+          <!-- /文章评论列表 -->
+        </div>
+        <!-- /文章详情 -->
 
         <!-- 把底部区域放到这里，确保在有数据以后，再加载底部区域。否则评论、收藏等需要数据的组件没有数据，需要刷新才能正常显示。 -->
         <!-- 底部区域 -->
@@ -133,7 +137,7 @@
         </div>
         <!-- /底部区域 -->
       </div>
-      <!-- /加载完成-文章详情 -->
+      <!-- /加载完成 -->
 
       <!-- 加载失败：404 -->
       <div v-else-if="errStatus === 404" class="error-wrap">
@@ -397,6 +401,7 @@ export default {
 
   .article-bottom {
     position: fixed;
+    z-index: 9;
     left: 0;
     right: 0;
     bottom: 0;
