@@ -50,9 +50,9 @@ const routes = [
     component: () => import('@/views/my-following-fan-list')
   },
   {
-    path: '/my/collection', // 收藏
-    name: 'collection',
-    component: () => import('@/views/my-collection')
+    path: '/my/favhisart', // 收藏/浏览/作品记录
+    name: 'favhisart',
+    component: () => import('@/views/my-fav-his-art')
   },
   {
     path: '/my/chatrobot', // 聊天机器人

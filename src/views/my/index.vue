@@ -53,15 +53,39 @@
 
     <!-- 宫格导航 -->
     <van-grid clickable :column-num="3" class="grid-nav mb-9">
-      <van-grid-item class="grid-item" to="/my/collection">
+      <van-grid-item
+        class="grid-item"
+        :to="{
+          name: 'favhisart', // 路由中设定的名称
+          params: {
+            activeTab: 0
+          }
+        }"
+      >
         <i slot="icon" class="vuetoutiao vuetoutiao-shoucang"></i>
         <span slot="text" class="text">收藏</span>
       </van-grid-item>
-      <van-grid-item class="grid-item">
+      <van-grid-item
+        class="grid-item"
+        :to="{
+          name: 'favhisart', // 路由中设定的名称
+          params: {
+            activeTab: 1
+          }
+        }"
+      >
         <i slot="icon" class="vuetoutiao vuetoutiao-lishi"></i>
         <span slot="text" class="text">历史</span>
       </van-grid-item>
-      <van-grid-item class="grid-item">
+      <van-grid-item
+        class="grid-item"
+        :to="{
+          name: 'favhisart', // 路由中设定的名称
+          params: {
+            activeTab: 2
+          }
+        }"
+      >
         <i slot="icon" class="vuetoutiao vuetoutiao-zuopin"></i>
         <span slot="text" class="text">作品</span>
       </van-grid-item>
