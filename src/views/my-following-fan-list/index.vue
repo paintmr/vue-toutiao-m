@@ -1,7 +1,7 @@
 <template>
   <div class="follow-fan-list-wrap">
     <van-nav-bar
-      class="page-nav-bar"
+      class="page-nav-bar page-nav-bar-position"
       left-arrow
       @click-left="goBack"
     >
@@ -103,33 +103,42 @@ export default {
 </script>
 
 <style scoped lang="less">
-.van-nav-bar__title {
-  position: relative;
-  .tab_underline {
-    position: absolute;
-    bottom: 15px;
-    left: 288px;
-    z-index: 1;
-    width: 56px;
-    height: 5px;
-    background-color: #fff;
-    border-radius: 2px;
-    transition-duration: 0.3s;
+.follow-fan-list-wrap {
+  padding-top: 92px;
+  .page-nav-bar-position {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
   }
-  .selectedtab {
-    font-weight: 700;
+  .van-nav-bar__title {
+    position: relative;
+    .tab_underline {
+      position: absolute;
+      bottom: 15px;
+      left: 288px;
+      z-index: 1;
+      width: 56px;
+      height: 5px;
+      background-color: #fff;
+      border-radius: 2px;
+      transition-duration: 0.3s;
+    }
+    .selectedtab {
+      font-weight: 700;
+    }
+    .fanunderline {
+      transform: translateX(120px);
+      transition-duration: 0.3s;
+    }
+    .van-button--info {
+      color: #fff;
+      background-color: #3296fa;
+      border: 1px solid #3296fa;
+    }
   }
-  .fanunderline {
-    transform: translateX(120px);
-    transition-duration: 0.3s;
+  /deep/ .van-tabs__wrap {
+    display: none;
   }
-  .van-button--info {
-    color: #fff;
-    background-color: #3296fa;
-    border: 1px solid #3296fa;
-  }
-}
-/deep/ .van-tabs__wrap {
-  display: none;
 }
 </style>

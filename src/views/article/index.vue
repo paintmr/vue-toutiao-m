@@ -5,7 +5,7 @@
       class="page-nav-bar"
       left-arrow
       title="黑马头条"
-      @click-left="$router.back()"
+      @click-left="goBack"
     ></van-nav-bar>
     <!-- /导航栏 -->
 
@@ -305,6 +305,14 @@ export default {
     },
     toUserInfo () {
       this.$router.push({ name: 'user-others', params: { userId: this.article.aut_id } })
+    },
+    goBack () {
+      if (this.$route.params.tabIndex || this.$route.params.tabIndex === 0) {
+        // 说明从my页面的收藏/历史/作品过来的。要把页面的tabIndex保存好，这样，回到刚才的页面时，会显示相应的activeTab
+        this.$router.push({ name: 'favhisart', params: { activeTab: this.$route.params.tabIndex, userId: this.$route.params.userId } })
+      } else {
+        this.$router.back()
+      }
     }
   }
 }

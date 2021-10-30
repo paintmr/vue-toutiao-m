@@ -58,7 +58,8 @@
         :to="{
           name: 'favhisart', // 路由中设定的名称
           params: {
-            activeTab: 0
+            activeTab: 0,
+            userId: userInfo.id
           }
         }"
       >
@@ -70,7 +71,8 @@
         :to="{
           name: 'favhisart', // 路由中设定的名称
           params: {
-            activeTab: 1
+            activeTab: 1,
+            userId: userInfo.id
           }
         }"
       >
@@ -82,7 +84,8 @@
         :to="{
           name: 'favhisart', // 路由中设定的名称
           params: {
-            activeTab: 2
+            activeTab: 2,
+            userId: userInfo.id
           }
         }"
       >

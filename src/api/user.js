@@ -142,3 +142,25 @@ export const getFanList = params => {
     params
   })
 }
+
+/**
+ * 获取用户的收藏列表
+ */
+export const getFavouritesList = params => {
+  return request({
+    method: 'GET',
+    url: '/v1_0/article/collections',
+    params
+  })
+}
+
+/**
+ * 获取用户的浏览历史列表
+ */
+export const getHistoryList = params => {
+  return request({
+    method: 'GET',
+    url: '/v1_0/user/histories',
+    params
+  })
+}
