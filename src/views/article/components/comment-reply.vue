@@ -28,7 +28,7 @@
         :source="comment.com_id"
         type="c"
         :list = "commentList"
-        @reply-click="onReplyClick"
+        @reply-click="fromCommentReplyItem($event)"
         :isShowingReplyList="isShowingReplyList"
       />
       <!-- /评论的回复列表 -->
@@ -36,7 +36,7 @@
 
     <!-- 底部发布评论区域 -->
     <div class="post-wrap">
-      <van-button size="small" round class="post-btn" @click="isWriteReplyShow=true">回复层主</van-button>
+      <van-button size="small" round class="post-btn" @click="onReplyClick">回复层主</van-button>
     </div>
     <!-- /底部发布评论区域 -->
 
@@ -47,7 +47,8 @@
         :target="comment.com_id"
         @post-comment-success="onPostCommentReplySuccess"
         :replyTarget="reply.aut_name"
-        @deleteReplyTarget="reply.aut_name=''"
+        @deleteReplyTarget="reply={}"
+        @reply-click="onReplyClick($event)"
       />
     </van-popup>
     <!-- /撰写评论弹出层 -->
@@ -57,7 +58,7 @@
 <script>
 import CommentItem from './comment-item'
 import CommentList from './comment-list'
-import CommentPost from './comment-post'
+import CommentPost from '@/components/comment-post'
 
 export default {
   name: 'CommentReply',
@@ -87,15 +88,20 @@ export default {
   methods: {
     onPostCommentReplySuccess (data) {
       // 更新回复数量
-      this.comment.reply_count++
-      this.$emit('update-comment_reply_count', this.comment.reply_count)
+      const replyCount = this.comment.reply_count
+      this.$emit('update-comment_reply_count', replyCount + 1)
       // 关闭弹层
       this.isWriteReplyShow = false
       // 刷新评论列表，把最新回复显示到回复列表顶部。
       this.commentList.unshift(data.new_obj)
     },
-    onReplyClick (comment) {
-      this.reply = comment
+    onReplyClick () {
+      this.reply = this.comment
+      // 显示撰写回复评论的弹出层
+      this.isWriteReplyShow = true
+    },
+    fromCommentReplyItem (event) {
+      this.reply = event
       // 显示撰写回复评论的弹出层
       this.isWriteReplyShow = true
     }

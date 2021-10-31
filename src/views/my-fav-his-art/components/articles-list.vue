@@ -53,7 +53,7 @@ export default {
           is_liking: 8
         },
         {
-          art_id: 137528,
+          art_id: 137768,
           title: '惠风和畅',
           aut_id: this.userId,
           aut_name: this.userName,

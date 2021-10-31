@@ -90,7 +90,7 @@
             :source="article.art_id"
             @onload-success = "totalCommentCount = $event.total_count"
             :list="commentList"
-            @reply-click="onReplyClick"
+            @reply-click="currentComment=$event;isRepliesShow = true;"
           />
           <!-- /文章评论列表 -->
         </div>
@@ -178,7 +178,7 @@
         v-if="isRepliesShow"
         :comment="currentComment"
         @close-write-reply-show="isRepliesShow = false"
-        @update-comment_reply_count="currentComment.reply_count = $event"
+        @update-comment_reply_count="updateCommentReplyCount($event)"
       />
     </van-popup>
     <!-- 回复评论弹出层 -->
@@ -192,7 +192,7 @@ import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
 import CommentList from './components/comment-list'
-import CommentPost from './components/comment-post'
+import CommentPost from '@/components/comment-post'
 import CommentReply from './components/comment-reply'
 
 export default {
@@ -298,10 +298,9 @@ export default {
       // 更新评论总条数
       this.totalCommentCount = this.commentList.length
     },
-    onReplyClick (comment) {
-      this.currentComment = comment
+    updateCommentReplyCount (commentCount) {
+      this.currentComment.reply_count = commentCount
       // 显示回复评论弹出层
-      this.isRepliesShow = true
     },
     toUserInfo () {
       this.$router.push({ name: 'user-others', params: { userId: this.article.aut_id } })

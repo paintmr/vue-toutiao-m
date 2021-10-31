@@ -42,7 +42,8 @@ export default {
   },
   data () {
     return {
-      message: ''
+      message: '',
+      prams: {} // addComment的参数
     }
   },
   computed: {},
@@ -51,7 +52,6 @@ export default {
   mounted () {},
   methods: {
     async onPost () {
-      // 展示登录中 loading
       // 在组件中通过this.$toast来调用Toast组件
       this.$toast.loading({
         message: '发布中……',
@@ -62,15 +62,23 @@ export default {
         // 如果是回复评论：
         if (this.replyTarget) {
           this.message = `回复${this.replyTarget}：${this.message}`
+
+          this.params = {
+            target: this.target.toString(),
+            content: this.message,
+            art_id: typeof this.articleId === 'object' ? this.articleId.toString() : this.articleId
+          }
           // 每次提交回复后，要把replyTarget置空，否则在comment-reply中回复comment时，会带上这个replyTarget
           this.$emit('deleteReplyTarget')
+        } else {
+          this.params = {
+            target: this.target.toString(),
+            content: this.message
+          }
         }
+
         // 向服务器提交新增的评论
-        const { data } = await addComment({
-          target: this.target.toString(),
-          content: this.message,
-          art_id: typeof this.articleId === 'object' ? this.articleId.toString : this.articleId
-        })
+        const { data } = await addComment(this.params)
         // 关闭弹层和刷新评论列表
         this.$emit('post-comment-success', data.data)
         // 清空文本框
