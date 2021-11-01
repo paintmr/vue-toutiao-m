@@ -49,12 +49,16 @@
           class="btn-item"
           :name="article.is_liking === true ? 'good-job' : 'good-job-o'"
           :color="article.is_liking === true ? '#e5645f' : ''"
-          :loading="loading"
+          :loading="likeLoading"
         />
         <span>{{ article.like_count ? article.like_count : '点赞'}}</span>
       </div>
-      <div class="item">
-        <van-icon name="star-o" />
+      <div class="item" @click="onFavourites">
+        <van-icon
+          :name="isCollected ? 'star' : 'star-o'"
+          :color="isCollected ? '#ffa500' : ''"
+          :loading="favouritesLoading"
+        />
         <span>{{ article.collect_count ? article.collect_count : '收藏'}}</span>
       </div>
     </div>
@@ -76,7 +80,7 @@
 
 <script>
 import CommentPost from '@/components/comment-post'
-import { addLike, cancelLike } from '@/api/article'
+import { addLike, cancelLike, getArticleById, addCollect, cancelCollect } from '@/api/article'
 
 export default {
   name: 'FHAItem',
@@ -100,9 +104,16 @@ export default {
   data () {
     return {
       isWriteCommentShow: false, // 是否显示撰写文章评论弹出层
-      loading: false, // 点赞/取消点赞时的loading
-      likeFlag: true // 点赞时的记号，防止用户快速点击时多次调用onLike
+      likeLoading: false, // 点赞/取消点赞时的likeLoading
+      likeFlag: true, // 点赞时的记号，防止用户快速点击时多次调用onLike
+      isCollected: false,
+      favouritesLoading: false,
+      favouritesFlag: true
     }
+  },
+  async created () {
+    const { data } = await getArticleById(this.article.art_id.toString())
+    this.isCollected = data.data.is_collected
   },
   methods: {
     onPostCommentSuccess () {
@@ -115,28 +126,56 @@ export default {
     async onLike () {
       if (this.likeFlag) {
         this.likeFlag = false
-        this.loading = true
+        this.likeLoading = true
         // 更新数据库
         try {
           if (this.article.is_liking === true) {
             // 已点赞，取消点赞
             await cancelLike(this.article.art_id)
-            // 通知list更新点赞的视图和数据
-            this.article.is_liking = false
-            this.article.like_count--
+            // 通知list更新点赞的视图
+            this.$emit('update-is_liking', false)
+            this.$emit('update-like_count', this.article.like_count - 1)
           } else {
             // 未点赞，点赞文章
             await addLike(this.article.art_id)
-            // 通知list更新点赞的视图和数据
-            this.article.is_liking = true
-            this.article.like_count++
+            // 通知list更新点赞的视图
+            this.$emit('update-is_liking', true)
+            this.$emit('update-like_count', this.article.like_count + 1)
           }
           this.$toast.success(this.article.is_liking === false ? '取消点赞' : '点赞成功')
         } catch (err) {
           this.$toast.fail('操作失败，请重试！')
         }
-        this.loading = false
+        this.likeLoading = false
         this.likeFlag = true
+      }
+    },
+    async onFavourites () {
+      if (this.favouritesFlag) {
+        this.favouritesFlag = false
+        this.favouritesloading = true
+        // 更新数据库
+        try {
+          if (this.isCollected) {
+            // 已收藏，取消收藏
+            await cancelCollect(this.article.art_id)
+            // 通知list修改收藏数量，从而更新视图
+            this.$emit('update-collect_count', this.article.collect_count - 1)
+          } else {
+            // 未收藏，收藏文章
+            await addCollect(this.article.art_id)
+            // 通知list修改收藏数量，从而更新视图
+            this.$emit('update-collect_count', this.article.collect_count + 1)
+          }
+          // 更新收藏的icon视图
+          this.isCollected = !this.isCollected
+          // 提示
+          this.$toast.success(this.isCollected ? '收藏成功' : '取消收藏')
+        } catch (err) {
+          this.$toast.fail('操作失败，请重试！')
+        }
+        this.favouritesloading = false
+        this.favouritesFlag = true
       }
     }
   }

@@ -16,6 +16,9 @@
           :tabIndex="tabIndex"
           :userId="userId"
           @update-comm_count="article.comm_count++"
+          @update-is_liking="article.is_liking=$event"
+          @update-like_count="article.like_count=$event"
+          @update-collect_count="article.collect_count=$event"
         />
       </van-list>
     </van-pull-refresh>
