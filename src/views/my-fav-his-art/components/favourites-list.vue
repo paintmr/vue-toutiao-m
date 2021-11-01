@@ -9,7 +9,14 @@
         :error.sync="error"
         error-text="请求失败，点击重新加载"
       >
-        <f-h-a-item v-for="(article, index) in list" :key="index" :article="article" :tabIndex="tabIndex" :userId="userId"/>
+        <f-h-a-item
+          v-for="(article, index) in list"
+          :key="index"
+          :article="article"
+          :tabIndex="tabIndex"
+          :userId="userId"
+          @update-comm_count="article.comm_count++"
+        />
       </van-list>
     </van-pull-refresh>
   </div>

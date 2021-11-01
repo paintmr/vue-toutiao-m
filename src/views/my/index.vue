@@ -96,7 +96,7 @@
     <!-- /宫格导航 -->
 
     <!-- 单元格 -->
-    <!-- is-link默认带有clickable的效果 -->
+    <!-- is-link默认带有ble的效果 -->
     <!-- :to="{ name: 'a' }" -->
     <van-cell title="小智同学" is-link to="/my/chatrobot" />
     <van-cell

@@ -42,20 +42,29 @@
     <div class="comment-like-favourites-wrap">
       <div class="item" @click="isWriteCommentShow=true">
         <van-icon class="comment-icon" name="comment-o" />
-        <span>评论</span>
+        <span>{{ article.comm_count ? article.comm_count : '评论'}}</span>
       </div>
-      <div class="item">
-        <van-icon class="btn-item" name="good-job-o" />
-        <span>点赞</span>
+      <div class="item" @click="onLike">
+        <van-icon
+          class="btn-item"
+          :name="article.is_liking === true ? 'good-job' : 'good-job-o'"
+          :color="article.is_liking === true ? '#e5645f' : ''"
+          :loading="loading"
+        />
+        <span>{{ article.like_count ? article.like_count : '点赞'}}</span>
       </div>
       <div class="item">
         <van-icon name="star-o" />
-        <span>收藏</span>
+        <span>{{ article.collect_count ? article.collect_count : '收藏'}}</span>
       </div>
     </div>
 
     <!-- 发布评论弹出层(不设置高度，由内容自行撑开) -->
-    <van-popup v-model="isWriteCommentShow" position="bottom">
+    <van-popup
+      v-if="isWriteCommentShow"
+      v-model="isWriteCommentShow"
+      position="bottom"
+    >
       <comment-post
         :target="article.art_id"
         @post-comment-success="onPostCommentSuccess"
@@ -67,6 +76,7 @@
 
 <script>
 import CommentPost from '@/components/comment-post'
+import { addLike, cancelLike } from '@/api/article'
 
 export default {
   name: 'FHAItem',
@@ -89,14 +99,45 @@ export default {
   },
   data () {
     return {
-      isWriteCommentShow: false // 是否显示撰写文章评论弹出层
+      isWriteCommentShow: false, // 是否显示撰写文章评论弹出层
+      loading: false, // 点赞/取消点赞时的loading
+      likeFlag: true // 点赞时的记号，防止用户快速点击时多次调用onLike
     }
   },
   methods: {
-    onPostCommentSuccess (dataaa) {
+    onPostCommentSuccess () {
       // 关闭弹层
       this.isWriteCommentShow = false
+
       // 更新评论总条数
+      this.$emit('update-comm_count')
+    },
+    async onLike () {
+      if (this.likeFlag) {
+        this.likeFlag = false
+        this.loading = true
+        // 更新数据库
+        try {
+          if (this.article.is_liking === true) {
+            // 已点赞，取消点赞
+            await cancelLike(this.article.art_id)
+            // 通知list更新点赞的视图和数据
+            this.article.is_liking = false
+            this.article.like_count--
+          } else {
+            // 未点赞，点赞文章
+            await addLike(this.article.art_id)
+            // 通知list更新点赞的视图和数据
+            this.article.is_liking = true
+            this.article.like_count++
+          }
+          this.$toast.success(this.article.is_liking === false ? '取消点赞' : '点赞成功')
+        } catch (err) {
+          this.$toast.fail('操作失败，请重试！')
+        }
+        this.loading = false
+        this.likeFlag = true
+      }
     }
   }
 }

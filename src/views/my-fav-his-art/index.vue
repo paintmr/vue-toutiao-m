@@ -32,9 +32,9 @@
 
     <van-tabs v-model="active">
       <van-tab v-for="index in 3" :key="index">
-          <favourites-list v-if="index===1" :tabIndex="0" :userId="userId"/>
-          <history-list v-if="index===2" :tabIndex="1" :userId="userId"/>
-          <articles-list v-if="index===3" :tabIndex="2" :userId="userId"/>
+          <favourites-list v-if="index===1" :tabIndex="0" :userId="userId" :key="fKey"/>
+          <history-list v-if="index===2" :tabIndex="1" :userId="userId" :key="hKey"/>
+          <articles-list v-if="index===3" :tabIndex="2" :userId="userId" :key="aKey"/>
       </van-tab>
     </van-tabs>
 
@@ -52,7 +52,10 @@ export default {
   data () {
     return {
       active: 1,
-      userId: null
+      userId: null,
+      fKey: 0,
+      hKey: 0,
+      aKey: 0
     }
   },
   components: {
@@ -84,16 +87,22 @@ export default {
 
       // 用户可以点击tab的时候，说明此时已进入本页面。把这个数据记录到localstorage（即便刷新页面，数据依旧存在），用于判断用户刷新后加载页面时，把哪个tab（收藏、历史）展现给用户
       setItem('F_H_A_ACTIVE_TAB', this.active)
+
+      this.fKey++
     },
     showHistory () {
       this.active = 1
 
       setItem('F_H_A_ACTIVE_TAB', this.active)
+
+      this.hKey++
     },
     showArticles () {
       this.active = 2
 
       setItem('F_H_A_ACTIVE_TAB', this.active)
+
+      this.aKey++
     },
     goBack () {
       // 用户有可能浏览过很多文章详情的页面，如果用this.$router.back()会回到这些文章详情页面，到不了my页面。所以用push最好
