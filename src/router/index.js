@@ -57,7 +57,7 @@ const routes = [
   {
     path: '/my/chatrobot', // 聊天机器人
     name: 'chat-robot',
-    component: () => import('@/views/chat-robot')
+    component: () => import('@/views/my-chat-robot')
   },
   {
     path: '/my/setting', // 系统设置

@@ -98,7 +98,16 @@
     <!-- 单元格 -->
     <!-- is-link默认带有ble的效果 -->
     <!-- :to="{ name: 'a' }" -->
-    <van-cell title="小智同学" is-link to="/my/chatrobot" />
+    <van-cell
+      title="小智同学"
+      is-link
+      :to="{
+        name: 'chat-robot',
+        params: {
+          avatar: userInfo.photo
+        }
+      }"
+    />
     <van-cell
       title="系统设置"
       is-link
