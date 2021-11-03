@@ -11,11 +11,10 @@
 
       <!-- 一组消息 -->
       <div
-        v-for="(chatInfoGroup, index) in chatInfoGroups"
+        v-for="(chatInfoGroup, timeStamp, index) in chatInfoGroups"
         :key="index"
         class="chat-group"
       >
-
         <!-- 时间 -->
         <div v-if="chatInfoGroup.chatTime" class="chat-time">{{ chatInfoGroup.chatTime }}</div>
 
@@ -58,16 +57,22 @@
 import dayjs from 'dayjs'
 import { setItem, getItem, removeItem } from '@/utils/storage'
 import robotAvatar from '@/assets/chat-robot.png'
+import { getRobotResponse } from '@/api/chatrobot.js'
+
+// import { io } from 'socket.io-client'
+// const socket = io('http://localhost:3000/')
 
 export default {
   name: 'MyChatRobot',
   data () {
     return {
-      chatInfoGroups: [],
+      chatInfoGroups: {},
       inputText: '',
       avatar: '',
       robotAvatar,
-      robotMsg: ''
+      chatInfoGroup: {},
+      responsing: true,
+      timeStamp: ''
     }
   },
   created () {
@@ -76,15 +81,58 @@ export default {
       setItem('AVATAR', this.$route.params.avatar)
     }
     this.avatar = getItem('AVATAR') ? getItem('AVATAR') : this.$route.params.avatar
+
+    // 创建socket链接
+    // socket的网址数据不对
+    // const url = 'http://ttapi.research.itcast.cn/'
+    // const url = 'http://toutiao-app.itheima.net/socket.io/'
+    // const url = 'http://localhost:3000/'
+    // this.socket = io(url, {
+    //   query: {
+    //     token: getItem('VUETOUTIAO_USER').token
+    //   }
+    // })
+    // console.log(this.socket)
   },
   methods: {
-    onInput () {
-      const chatInfoGroup = {}
-      chatInfoGroup.chatTime = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
-      chatInfoGroup.inputText = this.inputText
-      this.chatInfoGroups.push(chatInfoGroup)
-      // console.log(this.chatInfoGroups)
-      console.log(chatInfoGroup)
+    async onInput () {
+      if (this.responsing && this.inputText) {
+        this.responsing = false
+
+        const intervalMin = parseInt((new Date().getTime() - this.timeStamp) / 1000 / 60)
+        // const intervalMin = new Date((new Date().getTime() - this.timeStamp)).getMinutes()
+        if (intervalMin >= 1) {
+          this.chatInfoGroup.chatTime = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
+        }
+        this.timeStamp = new Date().getTime()
+
+        this.chatInfoGroup.inputText = this.inputText
+
+        this.chatInfoGroups[this.timeStamp] = this.chatInfoGroup
+
+        // 获取机器人的回应
+        // 我自己写的一个简单的后台返回的数据
+        // socket.emit('chat message', this.inputText)
+        // this.inputText = ''
+        // socket.on('chat message', respMsg => {
+        //   this.chatInfoGroup.robotMsg = respMsg
+        // })
+
+        const { data } = await getRobotResponse(this.inputText)
+        this.inputText = ''
+        this.chatInfoGroups[this.timeStamp].robotMsg = data.data.info.text
+
+        // 把时间，用户信息，机器人回复都存到了this.chatInfoGroup后，把它push进this.chatInfoGroups
+        this.chatInfoGroup = {}
+        this.scrollToBottom() // 把滚动条拉到最底端
+        this.responsing = true
+      }
+    },
+    scrollToBottom () {
+      const dom = document.querySelector('.chat-content-wrap')
+      this.$nextTick(() => {
+        dom.scrollTop = dom.scrollHeight
+      })
     }
   },
   beforeDestroy () {
@@ -96,9 +144,11 @@ export default {
 
 <style scoped lang="less">
 .my-chat-robot {
-  padding-top: 92px;
+  position: relative;
+  // padding: 92px 0 125px 0;
   background-color: #fff;
   height: 1334px;
+  box-sizing: border-box;
   overflow-y: scroll;
 
   .page-nav-bar-position {
@@ -109,9 +159,16 @@ export default {
   }
 
   .chat-content-wrap {
-    margin-top: 60px;
+    margin-top: 20px;
+    position: fixed;
+    top: 92px;
+    left: 0;
+    right: 0;
+    bottom: 125px;
+    overflow-y: scroll;
 
     .chat-group {
+      margin-bottom: 50px;
 
       .chat-time {
         text-align: center;
