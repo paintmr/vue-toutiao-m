@@ -11,7 +11,7 @@ dayjs.extend(relativeTime)
 // 配置后，可以全局使用中文语言包
 dayjs.locale('zh-cn')
 
-// daysjs() 获取当前最新事件
+// daysjs() 获取当前最新時間
 // console.log(dayjs().format('YYYY-MM-DD'))
 
 // 全局过滤器（可以在任何组件的模板template中使用）：处理相对时间。过滤器相当于一个全局可用的方法（仅供模板使用）

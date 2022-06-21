@@ -81,18 +81,6 @@ export default {
       setItem('AVATAR', this.$route.params.avatar)
     }
     this.avatar = getItem('AVATAR') ? getItem('AVATAR') : this.$route.params.avatar
-
-    // 创建socket链接
-    // socket的网址数据不对
-    // const url = 'http://ttapi.research.itcast.cn/'
-    // const url = 'http://toutiao-app.itheima.net/socket.io/'
-    // const url = 'http://localhost:3000/'
-    // this.socket = io(url, {
-    //   query: {
-    //     token: getItem('VUETOUTIAO_USER').token
-    //   }
-    // })
-    // console.log(this.socket)
   },
   methods: {
     async onInput () {
@@ -130,10 +118,24 @@ export default {
     },
     scrollToBottom () {
       const dom = document.querySelector('.chat-content-wrap')
+
+      // this.$nextTick和setTimeout二选一
       this.$nextTick(() => {
         dom.scrollTop = dom.scrollHeight
       })
+
+      // setTimeout(() => {
+      //   dom.scrollTop = dom.scrollHeight
+      // }, 0)
     }
+    // handleScroll (e) {
+    //   const dom = document.querySelector('.chat-content-wrap')
+    //   console.log('dom.scrollTop：' + dom.scrollTop)
+    //   console.log('dom.scrollHeight：' + dom.scrollHeight)
+    // }
+  },
+  mounted () {
+    // window.addEventListener('mousewheel', this.handleScroll)
   },
   beforeDestroy () {
     // 用户离开页面时，把localstorage里的avatar值销毁
@@ -145,11 +147,10 @@ export default {
 <style scoped lang="less">
 .my-chat-robot {
   position: relative;
-  // padding: 92px 0 125px 0;
+  padding: 92px 0 125px 0;
   background-color: #fff;
   height: 1334px;
   box-sizing: border-box;
-  overflow-y: scroll;
 
   .page-nav-bar-position {
     position: fixed;
@@ -160,12 +161,13 @@ export default {
 
   .chat-content-wrap {
     margin-top: 20px;
-    position: fixed;
-    top: 92px;
-    left: 0;
-    right: 0;
-    bottom: 125px;
-    overflow-y: scroll;
+    height: 1140px;
+    // position: fixed;
+    // top: 92px;
+    // left: 0;
+    // right: 0;
+    // bottom: 125px;
+    overflow-y: auto;
 
     .chat-group {
       margin-bottom: 50px;

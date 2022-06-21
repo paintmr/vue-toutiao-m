@@ -328,7 +328,7 @@ export default {
     right: 0;
     top: 92px;
     bottom: 88px;
-    overflow-y: scroll;
+    overflow-y: auto;
     background-color: #fff;
   }
 
